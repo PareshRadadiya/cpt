@@ -14,24 +14,21 @@ $cptg = new Cptg();
 class Cptg {
 
     // vars
-    var $dir,
-            $path,
-            $version;
+    var $dir;
 
     function __construct() {
 
         // vars
         $this->dir = plugins_url('', __FILE__);
-        $this->path = plugin_dir_path(__FILE__);
-        $this->version = '0.0.1';
+
 
         // actions
-        add_action('init', array($this, 'init'));
-        add_action('init', array($this, 'cptm_create_custom_post_types'));
-        add_action('admin_menu', array($this, 'cptm_admin_menu'));
-        add_action('admin_enqueue_scripts', array($this, 'cptm_styles'));
-        add_action('add_meta_boxes', array($this, 'cptm_create_meta_boxes'));
-        add_action('save_post', array($this, 'cptm_save_post'));
+        add_action('init', array($this, 'init'));  //hook for init cpt for custom post type generator
+        add_action('init', array($this, 'cptm_create_custom_post_types')); // hook for register cpt added by user using ihis plugin
+        add_action('admin_menu', array($this, 'cptm_admin_menu')); // hook for add menu option for Generate CPT
+        add_action('admin_enqueue_scripts', array($this, 'cptm_styles')); // hook for enququing stylesheet for UI of Generate CPT
+        add_action('add_meta_boxes', array($this, 'cptm_create_meta_boxes')); // hook to add metabox for options
+        add_action('save_post', array($this, 'cptm_save_post')); //hook to save post_meta for all option on Publish or Update of CPT
         add_action('manage_posts_custom_column', array($this, 'cptm_custom_columns'), 10, 2);
         add_action('manage_posts_custom_column', array($this, 'cptm_tax_custom_columns'), 10, 2);
         add_action('admin_footer', array($this, 'cptm_admin_footer'));
@@ -43,6 +40,7 @@ class Cptg {
         add_filter('manage_cptm_tax_posts_columns', array($this, 'cptm_tax_change_columns'));
         add_filter('manage_edit-cptm_tax_sortable_columns', array($this, 'cptm_tax_sortable_columns'));
         add_filter('post_updated_messages', array($this, 'cptm_post_updated_messages'));
+        add_filter('wp_insert_post_data', array($this, 'default_title'), 10, 2);
 
         // set textdomain
         load_plugin_textdomain('cptm', false, basename(dirname(__FILE__)) . '/lang');
@@ -441,6 +439,7 @@ class Cptg {
 
         // set defaults if new Custom Post Type is being created
         global $pagenow;
+
         $cptm_supports_title = $pagenow === 'post-new.php' ? 'title' : $cptm_supports_title;
         $cptm_supports_editor = $pagenow === 'post-new.php' ? 'editor' : $cptm_supports_editor;
         $cptm_supports_excerpt = $pagenow === 'post-new.php' ? 'excerpt' : $cptm_supports_excerpt;
@@ -1305,6 +1304,15 @@ class Cptg {
         }
 
         return $response;
+    }
+
+    function default_title($data, $postarr) {
+        if ($data['post_type'] == 'cptm') {
+            if (empty($data['post_title'])) {
+                $data['post_title'] = $_POST['cptm_name'];
+            }
+        }
+        return $data;
     }
 
 // # function wp_prepare_attachment_for_js()
