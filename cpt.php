@@ -48,7 +48,9 @@ class Cptg {
         load_plugin_textdomain('cptm', false, basename(dirname(__FILE__)) . '/lang');
     }
 
-// # function __construct()
+    /*
+     * Register cpt for plugin of type cptm
+     */
 
     public function init() {
 
@@ -116,8 +118,9 @@ class Cptg {
         }
     }
 
-// # function init()
-
+    /**
+     * Add admin menu for Generate CPT
+     */
     public function cptm_admin_menu() {
 
         // add cptm page to options menu
@@ -125,8 +128,10 @@ class Cptg {
         add_submenu_page('edit.php?post_type=cptm', __("Taxonomies", 'cptm'), __("Taxonomies", 'cptm'), 'manage_options', 'edit.php?post_type=cptm_tax');
     }
 
-// # function cptm_admin_menu()
-
+    /**
+     * enqueuing styles for cptm plugin page
+     * @param type $hook
+     */
     public function cptm_styles($hook) {
 
         // register overview style
@@ -153,8 +158,9 @@ class Cptg {
         }
     }
 
-// # function cptm_styles()
-
+    /**
+     * Register all CPT of from post_meta of type cptm at init
+     */
     public function cptm_create_custom_post_types() {
 
         // vars
@@ -361,14 +367,11 @@ class Cptg {
                 }
             }
         }
-
-        // flush permalink structure
-        // global $wp_rewrite;
-        // $wp_rewrite->flush_rules();
     }
 
-// # function cptm_create_custom_post_types()
-
+    /**
+     * Add metabox for options of CPT and taxonomy
+     */
     public function cptm_create_meta_boxes() {
 
         // add options meta box
@@ -382,6 +385,11 @@ class Cptg {
 
 // # function cptm_create_meta_boxes()
 
+    /**
+     * Options metabox callback for CPT generator
+     * @global type $pagenow
+     * @param type $post
+     */
     public function cptm_meta_box($post) {
 
         // get post meta values
@@ -498,7 +506,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_rewrite"><?php _e('Rewrite', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <select name="cptm_rewrite" id="cptm_rewrite" tabindex="6">
@@ -510,7 +518,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_withfront"><?php _e('With Front', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_withfront" id="cptm_withfront" tabindex="7">
@@ -522,7 +530,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_custom_rewrite_slug"><?php _e('Custom Rewrite Slug', 'cptm'); ?></label>
-                  
+
                 </td>
                 <td>
                     <input type="text" name="cptm_custom_rewrite_slug" id="cptm_custom_rewrite_slug" class="widefat" tabindex="8" value="<?php echo $cptm_custom_rewrite_slug; ?>" />
@@ -536,7 +544,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_feeds"><?php _e('Feeds', 'cptm'); ?></label>
-                
+
                 </td>
                 <td>
                     <select name="cptm_feeds" id="cptm_feeds" tabindex="9">
@@ -548,7 +556,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_pages"><?php _e('Pages', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_pages" id="cptm_pages" tabindex="10">
@@ -560,7 +568,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_exclude_from_search"><?php _e('Exclude From Search', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_exclude_from_search" id="cptm_exclude_from_search" tabindex="11">
@@ -572,8 +580,8 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_has_archive"><?php _e('Has Archive', 'cptm'); ?></label>
-                    
-                    
+
+
                 </td>
                 <td>
                     <select name="cptm_has_archive" id="cptm_has_archive" tabindex="12">
@@ -590,7 +598,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_show_ui"><?php _e('Show UI', 'cptm'); ?></label>
-                  
+
                 </td>
                 <td>
                     <select name="cptm_show_ui" id="cptm_show_ui" tabindex="13">
@@ -602,7 +610,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_menu_position"><?php _e('Menu Position', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <input type="number" name="cptm_menu_position" id="cptm_menu_position" class="widefat" tabindex="14" value="<?php echo $cptm_menu_position; ?>" />
@@ -611,7 +619,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_show_in_menu"><?php _e('Show in Menu', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_show_in_menu" id="cptm_show_in_menu" tabindex="15">
@@ -641,7 +649,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_capability_type"><?php _e('Capability Type', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <select name="cptm_capability_type" id="cptm_capability_type" tabindex="16">
@@ -653,7 +661,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_hierarchical"><?php _e('Hierarchical', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_hierarchical" id="cptm_hierarchical" tabindex="17">
@@ -665,7 +673,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_query_var"><?php _e('Query Var', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_query_var" id="cptm_query_var" tabindex="18">
@@ -677,7 +685,7 @@ class Cptg {
             <tr>
                 <td class="label top">
                     <label for="cptm_supports"><?php _e('Supports', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <input type="checkbox" tabindex="19" name="cptm_supports[]" id="cptm_supports_title" value="title" <?php checked($cptm_supports_title, 'title'); ?> /> <label for="cptm_supports_title"><?php _e('Title', 'cptm'); ?> <span class="default">(<?php _e('default', 'cptm'); ?>)</span></label><br />
@@ -708,8 +716,10 @@ class Cptg {
         <?php
     }
 
-// # function cptm_meta_box()
-
+    /**
+     * Options metabox callback for taxonomy generator
+     * @param type $post
+     */
     public function cptm_tax_meta_box($post) {
 
         // get post meta values
@@ -752,7 +762,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_name"><span class="required">*</span> <?php _e('Taxonomy Name', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <input type="text" required="" name="cptm_tax_name" id="cptm_tax_name" class="widefat" tabindex="1" value="<?php echo $cptm_tax_name; ?>" />
@@ -761,7 +771,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_label"><?php _e('Label', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <input type="text" name="cptm_tax_label" id="cptm_tax_label" class="widefat" tabindex="2" value="<?php echo $cptm_tax_label; ?>" />
@@ -770,7 +780,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_singular_name"><?php _e('Singular Name', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <input type="text" name="cptm_tax_singular_name" id="cptm_tax_singular_name" class="widefat" tabindex="3" value="<?php echo $cptm_tax_singular_name; ?>" />
@@ -779,7 +789,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_show_ui"><?php _e('Show UI', 'cptm'); ?></label>
-                 
+
                 </td>
                 <td>
                     <select name="cptm_tax_show_ui" id="cptm_tax_show_ui" tabindex="4">
@@ -791,7 +801,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_hierarchical"><?php _e('Hierarchical', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <select name="cptm_tax_hierarchical" id="cptm_tax_hierarchical" tabindex="5">
@@ -803,7 +813,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_rewrite"><?php _e('Rewrite', 'cptm'); ?></label>
-                   
+
                 </td>
                 <td>
                     <select name="cptm_tax_rewrite" id="cptm_tax_rewrite" tabindex="6">
@@ -815,7 +825,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_custom_rewrite_slug"><?php _e('Custom Rewrite Slug', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <input type="text" name="cptm_tax_custom_rewrite_slug" id="cptm_tax_custom_rewrite_slug" class="widefat" tabindex="7" value="<?php echo $cptm_tax_custom_rewrite_slug; ?>" />
@@ -824,7 +834,7 @@ class Cptg {
             <tr>
                 <td class="label">
                     <label for="cptm_tax_query_var"><?php _e('Query Var', 'cptm'); ?></label>
-                    
+
                 </td>
                 <td>
                     <select name="cptm_tax_query_var" id="cptm_tax_query_var" tabindex="8">
@@ -848,18 +858,21 @@ class Cptg {
                         $checked = in_array($post_type, $cptm_tax_post_types) ? 'checked="checked"' : '';
                         ?>
                         <input type="checkbox" tabindex="<?php echo $i; ?>" name="cptm_tax_post_types[]" id="cptm_tax_post_types_<?php echo $post_type; ?>" value="<?php echo $post_type; ?>" <?php echo $checked; ?> /> <label for="cptm_tax_post_types_<?php echo $post_type; ?>"><?php echo ucfirst($post_type); ?></label><br />
-            <?php
-            $i++;
-        }
-        ?>
+                        <?php
+                        $i++;
+                    }
+                    ?>
                 </td>
             </tr>
         </table>
         <?php
     }
 
-// # function cptm_meta_box()
-
+    /**
+     * Save all options of CPT and custom taxonomy inside post_meta
+     * @param type $post_id
+     * @return type
+     */
     public function cptm_save_post($post_id) {
 
         // verify if this is an auto save routine.
@@ -1119,25 +1132,25 @@ class Cptg {
                                     <td class="label column-label"><?php echo $post_type->labels->name; ?></td>
                                     <td class="description column-description"><?php echo $post_type->description; ?></td>
                                 </tr>
-                                    <?php
-                                }
+                                <?php
+                            }
 
-                                if (count($post_types) == 0) {
-                                    ?>
+                            if (count($post_types) == 0) {
+                                ?>
                                 <tr class="no-items"><td class="colspanchange" colspan="5"><?php _e('No Custom Post Types found', 'cptm'); ?>.</td></tr>
-                    <?php
-                }
-                ?>
+                                <?php
+                            }
+                            ?>
                         </tbody>
                     </table>
 
                     <div class="tablenav bottom">
                         <div class="tablenav-pages one-page">
                             <span class="displaying-num">
-                <?php
-                $count = count($post_types);
-                printf(_n('%d item', '%d items', $count), $count);
-                ?>
+                                <?php
+                                $count = count($post_types);
+                                printf(_n('%d item', '%d items', $count), $count);
+                                ?>
                             </span>
                             <br class="clear">
                         </div>
@@ -1212,25 +1225,25 @@ class Cptg {
                                     <td class="custom_post_type_name column-custom_post_type_name"><?php echo $taxonomy->name; ?></td>
                                     <td class="label column-label"><?php echo $taxonomy->labels->name; ?></td>
                                 </tr>
-                                    <?php
-                                }
+                                <?php
+                            }
 
-                                if (count($taxonomies) == 0) {
-                                    ?>
+                            if (count($taxonomies) == 0) {
+                                ?>
                                 <tr class="no-items"><td class="colspanchange" colspan="4"><?php _e('No custom Taxonomies found', 'cptm'); ?>.</td></tr>
-                    <?php
-                }
-                ?>
+                                <?php
+                            }
+                            ?>
                         </tbody>
                     </table>
 
                     <div class="tablenav bottom">
                         <div class="tablenav-pages one-page">
                             <span class="displaying-num">
-                <?php
-                $count = count($taxonomies);
-                printf(_n('%d item', '%d items', $count), $count);
-                ?>
+                                <?php
+                                $count = count($taxonomies);
+                                printf(_n('%d item', '%d items', $count), $count);
+                                ?>
                             </span>
                             <br class="clear">
                         </div>
