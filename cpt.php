@@ -9,20 +9,42 @@
  * Author URI: http://URI_Of_The_Plugin_Author
  * License: A "Slug" license name e.g. GPL2
  */
-add_action('init', 'register_plugin_cpt');
 
-function register_plugin_cpt() {
-    $label = array(
-        'name' => __('CPT Generator'),
-        'singular_name' => __('CPT Generator')
-    );
+// create cpt plugin settings menu
+add_action('admin_menu', 'cpt_create_menu');
 
-    register_post_type('cpt_plugin', array(
-        'labels' => $label,
-        'public' => false,
-        'show_ui' => true,
-        'menu_position' => 80,
-        'exclude_from_search' => true,
-            )
-    );
+function cpt_create_menu() {
+
+	//create new top-level  CPT Setting menu
+	add_menu_page('CPT Settings', 'CPT Settings', 'administrator', __FILE__, 'cpt_settings_page',plugins_url('/images/cpt-icon.png', __FILE__));
+
+	//call register settings function
+	add_action( 'admin_init', 'register_cpt_settings' );
 }
+
+
+function register_cpt_settings() {
+	//register our settings 
+	register_setting( 'cpt-settings-group', 'post_type' );
+}
+
+function cpt_settings_page() {
+?>
+<div class="wrap">
+<h2>CPT Settings</h2>
+
+<form method="post" action="options.php">
+    <?php settings_fields( 'cpt-settings-group' ); ?>
+    <?php do_settings_sections( 'cpt-settings-group' ); ?>
+    <table class="form-table">
+        <tr valign="top">
+        <th scope="row">Post Type</th>
+        <td><input type="text" name="post_type" value="<?php echo get_option('post_type'); ?>" /></td>
+        </tr>
+    </table>
+    
+    <?php submit_button(); ?>
+
+</form>
+</div>
+<?php } ?>
