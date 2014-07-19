@@ -14,17 +14,18 @@ class CptSettingsPage {
     /**
      * Holds the values to be used in the fields callbacks
      */
-    private $options;
+    private $options, $dir;
 
     /**
      * Start up
      */
     public function __construct() {
-// delete_option( 'cpt_option' );
         $this->options = get_option('cpt_option');
-        add_action('admin_menu', array($this, 'add_plugin_page'));
-        add_action('admin_init', array($this, 'page_init'));
-        add_action('init', array($this, 'register_cpt'));
+        $this->dir = plugins_url('', __FILE__);
+
+        add_action('admin_menu', array($this, 'add_plugin_page')); //Add menu inside setting for Generator
+        add_action('admin_init', array($this, 'page_init')); // Set setting page for CPT Generator
+        add_action('init', array($this, 'register_cpt'));//Register all CPT added using this plugin
     }
 
     function register_cpt() {
@@ -35,8 +36,8 @@ class CptSettingsPage {
                         'name' => $value['post_type'],
                         'singular_name' => $value['post_type']
                     ),
-                    'public' => true,
-                    'has_archive' => FALSE,
+                    'public' => $value['public'],
+                    'has_archive' => $value['has_archive'],
                     'rewrite' => array('slug' => $value['post_type']),
                     'supports' => $value['supports']
                         )
@@ -61,7 +62,8 @@ class CptSettingsPage {
     public function create_admin_page() {
 // Set class property
         $this->options = get_option('cpt_option');
-//  var_dump($this->options);
+        wp_register_style('cpt_generator_style', $this->dir . '/css/switch.css');
+        wp_enqueue_style('cpt_generator_style');
         ?>
         <div class="wrap">
 
@@ -81,7 +83,7 @@ class CptSettingsPage {
     }
 
     /**
-     * Register and add settings
+     * Register and add settings ,sections and fields
      */
     public function page_init() {
         register_setting(
@@ -106,8 +108,40 @@ class CptSettingsPage {
         );
 
         add_settings_field(
-                'support', // ID
-                'Support Type', // Title 
+                'labels_name', // ID
+                'Label Name', // Title 
+                array($this, 'labels_name_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
+        );
+
+        add_settings_field(
+                'labels_singular_name', // ID
+                'Singular Name', // Title 
+                array($this, 'labels_singular_name_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
+        );
+
+        add_settings_field(
+                'public', // ID
+                'Public', // Title 
+                array($this, 'public_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
+        );
+
+        add_settings_field(
+                'has_archive', // ID
+                'Has Archive', // Title 
+                array($this, 'has_archive_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
+        );
+
+        add_settings_field(
+                'supports', // ID
+                'Supports Type', // Title 
                 array($this, 'support_callback'), // Callback
                 'cpt-generator', // Page
                 'cpt_setting_section' // Section           
@@ -115,7 +149,7 @@ class CptSettingsPage {
     }
 
     /**
-     * Sanitize each setting field as needed
+     * Sanitize each option setting field as needed
      *
      * @param array $input Contains all settings fields as array keys
      */
@@ -128,15 +162,19 @@ class CptSettingsPage {
         if (get_option('cpt_option')) {
             $cpt_amount++;
         }
-
-
-
+        
         if ($editmode == 'add') {
 
 // Do Add Logic
             $cpt_option[$cpt_amount]["post_type"] = $_POST["post_type"];
-            $cpt_option[$cpt_amount]["supports"] = $_POST["supports"];
-// $cpt_option[$cpt_amount]["title"] = $_POST["title"];
+            $cpt_option[$cpt_amount]["labels_name"] = isset($_POST["labels_name"]) ? $_POST["labels_name"] : "";
+            $cpt_option[$cpt_amount]["labels_singular_name"] = isset($_POST["labels_singular_name"]) ? $_POST["labels_singular_name"] : "";
+            $cpt_option[$cpt_amount]["public"] = isset($_POST["public"]) ? true : false;
+            $cpt_option[$cpt_amount]["has_archive"] = isset($_POST["has_archive"]) ? true : false;
+            $cpt_option[$cpt_amount]["supports"] = isset($_POST["supports"]) ? $_POST["supports"] : array('');
+
+//            var_dump($cpt_option);
+//            die();
 
             return $cpt_option;
         } elseif ($editmode == 'edit') {
@@ -155,35 +193,88 @@ class CptSettingsPage {
     }
 
     /**
-     * Print the Section text
+     * Print the General Section info
      */
     public function print_section_info() {
         print 'Enter your general cpt settings below:';
     }
 
     /**
-     * Get the settings option array and print one of its values
+     * Post type name option callback
      */
     public function post_type_callback() {
         ?>
-        <input type="text" id="post_type" name="post_type" />
+        <input type="text" name="post_type" required="" />
         <?php
     }
 
-    public function support_callback() {
-//  $x = count($this->options);
+    /**
+     * Post label name option callback
+     */
+    public function labels_name_callback() {
         ?>
-        <input type="checkbox"  name="supports[]"  value="title"/>
-        <input type="checkbox"  name="supports[]"  value="editor"/>
-        <input type="checkbox"  name="supports[]"  value="author"/>
-        <input type="checkbox"  name="supports[]"  value="thumbnail"/>
-        <input type="checkbox"  name="supports[]"  value="excerpt"/>
-        <input type="checkbox"  name="supports[]"  value="trackbacks"/>
-        <input type="checkbox"  name="supports[]"  value="custom-fields"/>
-        <input type="checkbox"  name="supports[]"  value="comments"/>
-        <input type="checkbox"  name="supports[]"  value="revisions"/>
-        <input type="checkbox"  name="supports[]"  value="page-attributes"/>
-        <input type="checkbox"  name="supports[]"  value="post-formats"/>
+        <input type="text" name="labels_name" />
+        <?php
+    }
+
+    /**
+     * Post label sigular name option callback
+     */
+    public function labels_singular_name_callback() {
+        ?>
+        <input type="text" name="labels_singular_name" />
+        <?php
+    }
+
+    /**
+     * Public visibility option callback
+     */
+    public function public_callback() {
+        ?>
+
+        <div class="onoffswitch">
+            <input type="checkbox" name="public" id="public" class="onoffswitch-checkbox" value="true" checked="" >
+            <label class="onoffswitch-label" for="public">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    /**
+     * Achive option callback
+     */
+    public function has_archive_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="has_archive" id="has_archive" class="onoffswitch-checkbox" value="true" >
+            <label class="onoffswitch-label" for="has_archive">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    /**
+     * Supports option callbacks
+     */
+    public function support_callback() {
+        ?>
+        <input type="checkbox"  name="supports[]"  value="title"/> Title<br/>
+        <input type="checkbox"  name="supports[]"  value="editor"/> Editor<br/>
+        <input type="checkbox"  name="supports[]"  value="author"/> Author<br/>
+        <input type="checkbox"  name="supports[]"  value="thumbnail"/> Thumbnail <br/>
+        <input type="checkbox"  name="supports[]"  value="excerpt"/> Excerpt<br/>
+        <input type="checkbox"  name="supports[]"  value="trackbacks"/> Trackbacks<br/>
+        <input type="checkbox"  name="supports[]"  value="custom-fields"/> Custom Field<br/>
+        <input type="checkbox"  name="supports[]"  value="comments"/> Comments<br/>
+        <input type="checkbox"  name="supports[]"  value="revisions"/> Revisions<br/>
+        <input type="checkbox"  name="supports[]"  value="page-attributes"/> Page Attributes<br/>
+        <input type="checkbox"  name="supports[]"  value="post-formats"/> Post Formats<br/>
         <?php
     }
 
