@@ -9,7 +9,7 @@
  * Author URI: http://URI_Of_The_Plugin_Author
  * License: A "Slug" license name e.g. GPL2
  */
-class MySettingsPage {
+class CptSettingsPage {
 
     /**
      * Holds the values to be used in the fields callbacks
@@ -20,17 +20,38 @@ class MySettingsPage {
      * Start up
      */
     public function __construct() {
+// delete_option( 'cpt_option' );
+        $this->options = get_option('cpt_option');
         add_action('admin_menu', array($this, 'add_plugin_page'));
         add_action('admin_init', array($this, 'page_init'));
+        add_action('init', array($this, 'register_cpt'));
+    }
+
+    function register_cpt() {
+        if ($this->options) {
+            foreach ($this->options as $value) {
+                register_post_type($value['post_type'], array(
+                    'labels' => array(
+                        'name' => $value['post_type'],
+                        'singular_name' => $value['post_type']
+                    ),
+                    'public' => true,
+                    'has_archive' => FALSE,
+                    'rewrite' => array('slug' => $value['post_type']),
+                    'supports' => $value['supports']
+                        )
+                );
+            }
+        }
     }
 
     /**
      * Add options page
      */
     public function add_plugin_page() {
-        // This page will be under "Settings"
+// This page will be under "Settings"
         add_options_page(
-                'CPT Generator', 'CPT Generator', 'manage_options', 'my-setting-admin', array($this, 'create_admin_page')
+                'CPT Generator', 'CPT Generator', 'manage_options', 'cpt-generator', array($this, 'create_admin_page')
         );
     }
 
@@ -38,22 +59,22 @@ class MySettingsPage {
      * Options page callback
      */
     public function create_admin_page() {
-        // Set class property
-        $this->options = get_option('my_option_name');
-        var_dump($this->options);
+// Set class property
+        $this->options = get_option('cpt_option');
+//  var_dump($this->options);
         ?>
         <div class="wrap">
-            <?php screen_icon(); ?>
-            <h2>My Settings</h2>           
+
+            <h2>CPT Generator</h2>           
             <form method="post" action="options.php">
                 <?php
                 // This prints out all hidden setting fields
-                settings_fields('my_option_group');
-                do_settings_sections('my-setting-admin');
+                settings_fields('cpt_option_group');
+                do_settings_sections('cpt-generator');
                 submit_button();
                 ?>
                 <input type="hidden" name="editmode" value="add" />
-                
+
             </form>
         </div>
         <?php
@@ -64,28 +85,32 @@ class MySettingsPage {
      */
     public function page_init() {
         register_setting(
-                'my_option_group', // Option group
-                'my_option_name', // Option name
+                'cpt_option_group', // Option group
+                'cpt_option', // Option name
                 array($this, 'sanitize')
         );
 
         add_settings_section(
-                'setting_section_id', // ID
-                'My Custom Settings', // Title
+                'cpt_setting_section', // ID
+                'General Settings', // Title
                 array($this, 'print_section_info'), // Callback
-                'my-setting-admin' // Page
+                'cpt-generator' // Page
         );
 
         add_settings_field(
-                'id_number', // ID
-                'ID Number', // Title 
-                array($this, 'id_number_callback'), // Callback
-                'my-setting-admin', // Page
-                'setting_section_id' // Section           
+                'post_type', // ID
+                'Post Type', // Title 
+                array($this, 'post_type_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
         );
 
         add_settings_field(
-                'title', 'Title', array($this, 'title_callback'), 'my-setting-admin', 'setting_section_id'
+                'support', // ID
+                'Support Type', // Title 
+                array($this, 'support_callback'), // Callback
+                'cpt-generator', // Page
+                'cpt_setting_section' // Section           
         );
     }
 
@@ -96,38 +121,34 @@ class MySettingsPage {
      */
     public function sanitize($input) {
 
-//        $new_input = array();
-//        if( isset( $input['id_number'] ) )
-//            $new_input['id_number[]'] = absint( $input['id_number[]'] );
-//
-//        if( isset( $input['title[]'] ) )
-//            $new_input['title[]'] = sanitize_text_field( $input['title[]'] );
-//
-//        return $new_input;
-
-        $venues = get_option('my_option_name'); // Get the current options from the db (Edit 
-        // this and return the full modified version)
+        $cpt_option = get_option('cpt_option'); // Get the current options from the db (Edit 
+// this and return the full modified version)
         $editmode = $_POST['editmode'];  // add, edit or delete     
-       $x = count($venues);
-       $x++;
-       
+        $cpt_amount = count($cpt_option);
+        if (get_option('cpt_option')) {
+            $cpt_amount++;
+        }
+
+
+
         if ($editmode == 'add') {
 
-            // Do Add Logic
-            $venues[$x]["id_number"]=$_POST["id_number"];
-            $venues[$x]["title"]=$_POST["title"];
-           
-            return $venues;
+// Do Add Logic
+            $cpt_option[$cpt_amount]["post_type"] = $_POST["post_type"];
+            $cpt_option[$cpt_amount]["supports"] = $_POST["supports"];
+// $cpt_option[$cpt_amount]["title"] = $_POST["title"];
+
+            return $cpt_option;
         } elseif ($editmode == 'edit') {
 
-            // Do Edit Logic
+// Do Edit Logic
 
-            return $venues;
+            return $cpt_option;
         } elseif ($editmode == 'delete') {
 
-            // Do Delete Logic
+// Do Delete Logic
 
-            return $venues;
+            return $cpt_option;
         }
 
         return $input; // only triggered if none of the above are called
@@ -137,30 +158,36 @@ class MySettingsPage {
      * Print the Section text
      */
     public function print_section_info() {
-        print 'Enter your settings below:';
+        print 'Enter your general cpt settings below:';
     }
 
     /**
      * Get the settings option array and print one of its values
      */
-    public function id_number_callback() {
-      //  $x = count($this->options);
-        printf(
-                '<input type="text" id="id_number" name="id_number" value="%s" />', isset($this->options['id_number']) ? esc_attr($this->options['id_number']) : ''
-        );
+    public function post_type_callback() {
+        ?>
+        <input type="text" id="post_type" name="post_type" />
+        <?php
     }
 
-    /**
-     * Get the settings option array and print one of its values
-     */
-    public function title_callback() {
-       // $x = count($this->options);
-        printf(
-                '<input type="text" id="title" name="title" value="%s" />', isset($this->options['title']) ? esc_attr($this->options['title']) : ''
-        );
+    public function support_callback() {
+//  $x = count($this->options);
+        ?>
+        <input type="checkbox"  name="supports[]"  value="title"/>
+        <input type="checkbox"  name="supports[]"  value="editor"/>
+        <input type="checkbox"  name="supports[]"  value="author"/>
+        <input type="checkbox"  name="supports[]"  value="thumbnail"/>
+        <input type="checkbox"  name="supports[]"  value="excerpt"/>
+        <input type="checkbox"  name="supports[]"  value="trackbacks"/>
+        <input type="checkbox"  name="supports[]"  value="custom-fields"/>
+        <input type="checkbox"  name="supports[]"  value="comments"/>
+        <input type="checkbox"  name="supports[]"  value="revisions"/>
+        <input type="checkbox"  name="supports[]"  value="page-attributes"/>
+        <input type="checkbox"  name="supports[]"  value="post-formats"/>
+        <?php
     }
 
 }
 
 if (is_admin())
-    $my_settings_page = new MySettingsPage();
+    $cpt_settings_page = new CptSettingsPage();
