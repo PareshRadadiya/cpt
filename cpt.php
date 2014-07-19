@@ -33,8 +33,8 @@ class CptSettingsPage {
             foreach ($this->options as $value) {
                 register_post_type($value['post_type'], array(
                     'labels' => array(
-                        'name' => $value['post_type'],
-                        'singular_name' => $value['post_type']
+                        'name' => $value['labels_name'],
+                        'singular_name' => $value['labels_singular_name']
                     ),
                     'public' => $value['public'],
                     'has_archive' => $value['has_archive'],
@@ -79,7 +79,33 @@ class CptSettingsPage {
 
             </form>
         </div>
+ <?php if ($this->options) { ?>
+<table class="wp-list-table widefat fixed pages">
+    <thead>
+    <th class="manage-column">Post Name</th>
+    <th class="manage-column">Public</th>
+    <th class="manage-column">Label</th>
+    </thead>
+    <tbody>
+       <?php  foreach ($this->options as $value) { ?>
+        <tr>
+            <td class="post-title page-title column-title">
+                <strong><a><?php echo $value['post_type']; ?></a></strong>
+                <div class="row-actions">
+                    <span class="edit"><a href="" title="Edit this item">Edit</a> | </span>
+                    <span class="inline hide-if-no-js"><a href="#" class="editinline" title="Edit this item inline">Quick&nbsp;Edit</a> | </span>
+                    <span class="trash"><a class="submitdelete" title="Move this item to the Trash" href="">Trash</a> | </span>
+                    <span class="view"><a href="" title="View “Hello world!”" rel="permalink">View</a></span>
+                </div>
+            </td>
+            <td><?php echo $value['public']; ?></td>
+            <td><?php echo $value['labels_name']; ?></td>
+        </tr>
+       <?php } ?>
+    </tbody>
+</table>
         <?php
+ }
     }
 
     /**
