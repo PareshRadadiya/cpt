@@ -103,9 +103,9 @@ class CptSettingsPage {
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
                             <div class="row-actions">
-                                <span class="edit"><a href="http://child-theme-test.com/wp-admin/options-general.php?page=cpt-generator&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
+                                <span class="edit"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
                                 
-                                <span class="trash"><a class="submitdelete" href="http://child-theme-test.com/wp-admin/options-general.php?page=cpt-generator&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                <span class="trash"><a class="submitdelete" href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
                               
                             </div>
                         </td>
