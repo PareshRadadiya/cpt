@@ -44,7 +44,7 @@ class CtSettingsPage {
     }
 
     function register_ct() {
-        
+
         if ($this->options) {
             foreach ($this->options as $value) {
                 $labels = array(
@@ -53,13 +53,13 @@ class CtSettingsPage {
                 );
 
                 $args = array(
-                    'hierarchical' => false,
+                    'hierarchical' => $value['ct_hierarchical'],
                     'labels' => $labels,
-                    'show_ui' => true,
-                    'show_admin_column' => true,
+                    'show_ui' => $value['ct_show_ui'],
+                    'show_admin_column' => $value['ct_show_admin_column'],
                     'update_count_callback' => '_update_post_term_count',
                     'query_var' => true,
-                    'rewrite' => array('slug' => 'writer'),
+                    'rewrite' => array('slug' => $value['ct_name']),
                 );
 
                 register_taxonomy($value['ct_name'], $value['post_types'], $args);
@@ -147,7 +147,7 @@ class CtSettingsPage {
 
         add_settings_field(
                 'ct_name', // ID
-                'Name', // Title 
+                'Label Name', // Title 
                 array($this, 'ct_name_callback'), // Callback
                 'ct-generator', // Page
                 'ct_setting_section' // Section           
@@ -157,6 +157,29 @@ class CtSettingsPage {
                 'ct_singular_name', // ID
                 'Singular Name', // Title 
                 array($this, 'ct_singular_name_callback'), // Callback
+                'ct-generator', // Page
+                'ct_setting_section' // Section           
+        );
+
+        add_settings_field(
+                'ct_hierarchical', // ID
+                'Hierarchical', // Title 
+                array($this, 'ct_hierarchical_callback'), // Callback
+                'ct-generator', // Page
+                'ct_setting_section' // Section           
+        );
+        
+        add_settings_field(
+                'ct_show_ui', // ID
+                'Show UI', // Title 
+                array($this, 'ct_show_ui_callback'), // Callback
+                'ct-generator', // Page
+                'ct_setting_section' // Section           
+        );
+        add_settings_field(
+                'ct_show_admin_column', // ID
+                'Show Admin Column', // Title 
+                array($this, 'ct_show_admin_column_callback'), // Callback
                 'ct-generator', // Page
                 'ct_setting_section' // Section           
         );
@@ -180,8 +203,12 @@ class CtSettingsPage {
 // Do Add Logic
         $ct_option[$_POST["ct_name"]]["ct_name"] = $_POST["ct_name"];
         $ct_option[$_POST["ct_name"]]["ct_singular_name"] = $_POST["ct_singular_name"];
+        $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
+        $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
+        $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
         $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
-        ;
+
+ 
         return $ct_option;
     }
 
@@ -207,6 +234,52 @@ class CtSettingsPage {
     public function ct_singular_name_callback() {
         ?>
         <input type="text" name="ct_singular_name" required="" value="<?php echo isset($this->editval) ? $this->editval['ct_singular_name'] : "" ?>"/>
+        <?php
+    }
+
+    /**
+     * Achive option callback
+     */
+    public function ct_hierarchical_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_hierarchical" id="ct_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['ct_hierarchical'], true) : ""; ?>>
+            <label class="onoffswitch-label" for="ct_hierarchical">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+
+        <?php
+    }
+    /**
+     * Achive option callback
+     */
+    public function ct_show_ui_callback() {
+        ?>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
+                    <label class="onoffswitch-label" for="ct_show_ui">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+
+        <?php
+    }
+    /**
+     * Achive option callback
+     */
+    public function ct_show_admin_column_callback() {
+        ?>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="ct_show_admin_column" id="ct_show_admin_column" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_admin_column'], true) : "checked"; ?>>
+                    <label class="onoffswitch-label" for="ct_show_admin_column">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+
         <?php
     }
 
