@@ -27,7 +27,7 @@ class CtSettingsPage {
         add_action('admin_init', array($this, 'page_init')); // Set setting page for CT Generator
 
         /*
-         * delete cpt
+         * delete or edit ct
          */
         if (isset($_GET["page"]) && $_GET["page"] == "ct-generator") {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
@@ -43,6 +43,9 @@ class CtSettingsPage {
         add_action('init', array($this, 'register_ct')); //Register all CT added using this plugin
     }
 
+    /**
+     * Register all custom taxonomy from available options
+     */
     function register_ct() {
 
         if ($this->options) {
@@ -220,7 +223,7 @@ class CtSettingsPage {
     }
 
     /**
-     * Post type name option callback
+     * Label name option callback
      */
     public function ct_name_callback() {
         ?>
@@ -229,7 +232,7 @@ class CtSettingsPage {
     }
 
     /**
-     * Post label name option callback
+     * Taxonomy singular name option callback
      */
     public function ct_singular_name_callback() {
         ?>
@@ -238,7 +241,7 @@ class CtSettingsPage {
     }
 
     /**
-     * Achive option callback
+     * Is Hierarchical option callback
      */
     public function ct_hierarchical_callback() {
         ?>
@@ -253,7 +256,7 @@ class CtSettingsPage {
         <?php
     }
     /**
-     * Achive option callback
+     * Show UI option callback
      */
     public function ct_show_ui_callback() {
         ?>
@@ -268,7 +271,7 @@ class CtSettingsPage {
         <?php
     }
     /**
-     * Achive option callback
+     * Show in admin column option callback
      */
     public function ct_show_admin_column_callback() {
         ?>

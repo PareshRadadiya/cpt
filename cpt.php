@@ -27,7 +27,7 @@ class CptSettingsPage {
         add_action('admin_init', array($this, 'page_init')); // Set setting page for CPT Generator
 
         /*
-         * delete cpt
+         * delete or edit cpt 
          */
         if (isset($_GET["page"]) && $_GET["page"] == "cpt-generator") {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
@@ -41,6 +41,9 @@ class CptSettingsPage {
         add_action('init', array($this, 'register_cpt')); //Register all CPT added using this plugin
     }
 
+    /**
+     * Register all custom post type from available options
+     */
     function register_cpt() {
         if ($this->options) {
             foreach ($this->options as $value) {
