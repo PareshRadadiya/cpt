@@ -29,11 +29,13 @@ class CptSettingsPage {
         /*
          * delete cpt
          */
-        if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
-            unset($this->options[$_GET["cpt_post_type"]]);
-            update_option("cpt_option", $this->options);
-        } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
-            $this->editval = $this->options[$_GET["cpt_post_type"]];
+        if (isset($_GET["page"]) && $_GET["page"] == "cpt-generator") {
+            if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
+                unset($this->options[$_GET["cpt_post_type"]]);
+                update_option("cpt_option", $this->options);
+            } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
+                $this->editval = $this->options[$_GET["cpt_post_type"]];
+            }
         }
 
         add_action('init', array($this, 'register_cpt')); //Register all CPT added using this plugin
@@ -104,12 +106,12 @@ class CptSettingsPage {
                             <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
                             <div class="row-actions">
                                 <span class="edit"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
-                                
+
                                 <span class="trash"><a class="submitdelete" href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
-                              
+
                             </div>
                         </td>
-                        <td><?php echo $value['public']?"True":"False"; ?></td>
+                        <td><?php echo $value['public'] ? "True" : "False"; ?></td>
                         <td><?php echo $value['labels_name']; ?></td>
                     </tr>
                 <?php } ?>
@@ -292,3 +294,4 @@ class CptSettingsPage {
 
 if (is_admin())
     $cpt_settings_page = new CptSettingsPage();
+require_once(plugin_dir_path(__FILE__) . 'ct.php');
