@@ -1,30 +1,17 @@
 <?php
-
 /**
- * Plugin Name: CPT Demo
- * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
- * Description: A brief description of the Plugin.
- * Version: The Plugin's Version Number, e.g.: 1.0
- * Author: Name Of The Plugin Author
- * Author URI: http://URI_Of_The_Plugin_Author
- * License: A "Slug" license name e.g. GPL2
+ * Class for custom taxonomy plugin support
  */
-class CtSettingsPage {
+class CtSettings {
 
-    /**
-     * Holds the values to be used in the fields callbacks
-     */
     private $options, $dir, $editval;
 
-    /**
-     * Start up
-     */
     public function __construct() {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        add_action('admin_menu', array($this, 'add_plugin_page')); //Add menu inside setting for Generator
-        add_action('admin_init', array($this, 'page_init')); // Set setting page for CT Generator
+        add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
+        add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
 
         /*
          * delete or edit ct
@@ -73,19 +60,14 @@ class CtSettingsPage {
     /**
      * Add options page
      */
-    public function add_plugin_page() {
-// This page will be under "Settings"
-        add_options_page(
-                'CT Generator', 'CT Generator', 'manage_options', 'ct-generator', array($this, 'create_admin_page')
-        );
+    public function add_ct_plugin_page() {
+        add_options_page('CT Generator', 'CT Generator', 'manage_options', 'ct-generator', array($this, 'create_ct_page'));
     }
 
     /**
      * Options page callback
      */
-    public function create_admin_page() {
-// Set class property
-
+    public function create_ct_page() {
         $this->options = get_option('ct_option');
         wp_register_style('ct_generator_style', $this->dir . '/css/switch.css');
         wp_enqueue_style('ct_generator_style');
@@ -134,65 +116,65 @@ class CtSettingsPage {
     /**
      * Register and add settings ,sections and fields
      */
-    public function page_init() {
+    public function ct_page_init() {
         register_setting(
                 'ct_option_group', // Option group
                 'ct_option', // Option name
-                array($this, 'sanitize')
+                array($this, 'sanitize_ct_options')
         );
 
         add_settings_section(
                 'ct_setting_section', // ID
                 'General Settings', // Title
-                array($this, 'print_section_info'), // Callback
+                array($this, 'general_section_info'), // Callback
                 'ct-generator' // Page
         );
 
         add_settings_field(
-                'ct_name', // ID
-                'Label Name', // Title 
-                array($this, 'ct_name_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'ct_name',
+                'Label Name',
+                array($this, 'name_callback'),
+                'ct-generator',
+                'ct_setting_section'     
         );
 
         add_settings_field(
-                'ct_singular_name', // ID
-                'Singular Name', // Title 
-                array($this, 'ct_singular_name_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'ct_singular_name',
+                'Singular Name',
+                array($this, 'singular_name_callback'),
+                'ct-generator',
+                'ct_setting_section'
         );
 
         add_settings_field(
-                'ct_hierarchical', // ID
-                'Hierarchical', // Title 
-                array($this, 'ct_hierarchical_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'ct_hierarchical',
+                'Hierarchical',
+                array($this, 'hierarchical_callback'),
+                'ct-generator',
+                'ct_setting_section'
         );
         
         add_settings_field(
-                'ct_show_ui', // ID
-                'Show UI', // Title 
-                array($this, 'ct_show_ui_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'ct_show_ui',
+                'Show UI',
+                array($this, 'show_ui_callback'),
+                'ct-generator',
+                'ct_setting_section'
         );
         add_settings_field(
-                'ct_show_admin_column', // ID
-                'Show Admin Column', // Title 
-                array($this, 'ct_show_admin_column_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'ct_show_admin_column',
+                'Show Admin Column',
+                array($this, 'show_admin_column_callback'),
+                'ct-generator',
+                'ct_setting_section'
         );
 
         add_settings_field(
-                'post_types', // ID
-                'Post Type', // Title 
-                array($this, 'post_types_callback'), // Callback
-                'ct-generator', // Page
-                'ct_setting_section' // Section           
+                'post_types',
+                'Post Type',
+                array($this, 'post_types_callback'),
+                'ct-generator',
+                'ct_setting_section'
         );
     }
 
@@ -201,9 +183,8 @@ class CtSettingsPage {
      *
      * @param array $input Contains all settings fields as array keys
      */
-    public function sanitize($input) {
-        $ct_option = get_option('ct_option'); // Get the current options from the db (Edit 
-// Do Add Logic
+    public function sanitize_ct_options($input) {
+        $ct_option = get_option('ct_option'); // Get the current options from the db
         $ct_option[$_POST["ct_name"]]["ct_name"] = $_POST["ct_name"];
         $ct_option[$_POST["ct_name"]]["ct_singular_name"] = $_POST["ct_singular_name"];
         $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
@@ -218,14 +199,14 @@ class CtSettingsPage {
     /**
      * Print the General Section info
      */
-    public function print_section_info() {
+    public function general_section_info() {
         print 'Enter your general ct settings below:';
     }
 
     /**
      * Label name option callback
      */
-    public function ct_name_callback() {
+    public function name_callback() {
         ?>
         <input type="text" name="ct_name" required="" value="<?php echo isset($this->editval) ? $this->editval['ct_name'] : "" ?>" />
         <?php
@@ -234,7 +215,7 @@ class CtSettingsPage {
     /**
      * Taxonomy singular name option callback
      */
-    public function ct_singular_name_callback() {
+    public function singular_name_callback() {
         ?>
         <input type="text" name="ct_singular_name" required="" value="<?php echo isset($this->editval) ? $this->editval['ct_singular_name'] : "" ?>"/>
         <?php
@@ -243,7 +224,7 @@ class CtSettingsPage {
     /**
      * Is Hierarchical option callback
      */
-    public function ct_hierarchical_callback() {
+    public function hierarchical_callback() {
         ?>
         <div class="onoffswitch">
             <input type="checkbox" name="ct_hierarchical" id="ct_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['ct_hierarchical'], true) : ""; ?>>
@@ -258,7 +239,7 @@ class CtSettingsPage {
     /**
      * Show UI option callback
      */
-    public function ct_show_ui_callback() {
+    public function show_ui_callback() {
         ?>
                 <div class="onoffswitch">
                     <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
@@ -273,7 +254,7 @@ class CtSettingsPage {
     /**
      * Show in admin column option callback
      */
-    public function ct_show_admin_column_callback() {
+    public function show_admin_column_callback() {
         ?>
                 <div class="onoffswitch">
                     <input type="checkbox" name="ct_show_admin_column" id="ct_show_admin_column" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_admin_column'], true) : "checked"; ?>>
@@ -299,6 +280,4 @@ class CtSettingsPage {
     }
 
 }
-
-if (is_admin())
-    $ct_settings_page = new CtSettingsPage();
+    

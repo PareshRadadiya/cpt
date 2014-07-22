@@ -1,30 +1,18 @@
 <?php
 
 /**
- * Plugin Name: CPT Demo
- * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
- * Description: A brief description of the Plugin.
- * Version: The Plugin's Version Number, e.g.: 1.0
- * Author: Name Of The Plugin Author
- * Author URI: http://URI_Of_The_Plugin_Author
- * License: A "Slug" license name e.g. GPL2
+ * Class for custom post type support
  */
-class CptSettingsPage {
+class CptSettings {
 
-    /**
-     * Holds the values to be used in the fields callbacks
-     */
     private $options, $dir, $editval;
 
-    /**
-     * Start up
-     */
     public function __construct() {
         $this->options = get_option('cpt_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        add_action('admin_menu', array($this, 'add_plugin_page')); //Add menu inside setting for Generator
-        add_action('admin_init', array($this, 'page_init')); // Set setting page for CPT Generator
+        add_action('admin_menu', array($this, 'add_cpt_plugin_page')); //Add menu inside setting for Generator
+        add_action('admin_init', array($this, 'cpt_page_init')); // Set setting page for CPT Generator
 
         /*
          * delete or edit cpt 
@@ -65,19 +53,14 @@ class CptSettingsPage {
     /**
      * Add options page
      */
-    public function add_plugin_page() {
-// This page will be under "Settings"
-        add_options_page(
-                'CPT Generator', 'CPT Generator', 'manage_options', 'cpt-generator', array($this, 'create_admin_page')
-        );
+    public function add_cpt_plugin_page() {
+        add_options_page('CPT Generator', 'CPT Generator', 'manage_options', 'cpt-generator', array($this, 'create_cpt_page'));
     }
 
     /**
      * Options page callback
      */
-    public function create_admin_page() {
-// Set class property
-
+    public function create_cpt_page() {
         $this->options = get_option('cpt_option');
         wp_register_style('cpt_generator_style', $this->dir . '/css/switch.css');
         wp_enqueue_style('cpt_generator_style');
@@ -103,7 +86,7 @@ class CptSettingsPage {
                 <th class="manage-column">Label</th>
             </thead>
             <tbody>
-                <?php foreach ($this->options as $value) { ?>
+            <?php foreach ($this->options as $value) { ?>
                     <tr>
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
@@ -117,7 +100,7 @@ class CptSettingsPage {
                         <td><?php echo $value['public'] ? "True" : "False"; ?></td>
                         <td><?php echo $value['labels_name']; ?></td>
                     </tr>
-                <?php } ?>
+            <?php } ?>
             </tbody>
             </table>
             <?php
@@ -127,66 +110,66 @@ class CptSettingsPage {
     /**
      * Register and add settings ,sections and fields
      */
-    public function page_init() {
+    public function cpt_page_init() {
         register_setting(
                 'cpt_option_group', // Option group
                 'cpt_option', // Option name
-                array($this, 'sanitize')
+                array($this, 'sanitize_cpt_options')
         );
 
         add_settings_section(
                 'cpt_setting_section', // ID
                 'General Settings', // Title
-                array($this, 'print_section_info'), // Callback
+                array($this, 'general_section_info'), // Callback
                 'cpt-generator' // Page
         );
 
         add_settings_field(
-                'cpt_post_type', // ID
-                'Post Type', // Title 
-                array($this, 'post_type_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'cpt_post_type',
+                'Post Type', 
+                array($this, 'post_type_callback'),
+                'cpt-generator',
+                'cpt_setting_section'          
         );
 
         add_settings_field(
-                'labels_name', // ID
-                'Label Name', // Title 
-                array($this, 'labels_name_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'labels_name',
+                'Label Name',
+                array($this, 'labels_name_callback'),
+                'cpt-generator',
+                'cpt_setting_section'         
         );
 
         add_settings_field(
-                'labels_singular_name', // ID
-                'Singular Name', // Title 
-                array($this, 'labels_singular_name_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'labels_singular_name',
+                'Singular Name',
+                array($this, 'labels_singular_name_callback'),
+                'cpt-generator',
+                'cpt_setting_section'          
         );
 
         add_settings_field(
-                'public', // ID
-                'Public', // Title 
-                array($this, 'public_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'public',
+                'Public', 
+                array($this, 'public_callback'),
+                'cpt-generator',
+                'cpt_setting_section'          
         );
 
         add_settings_field(
-                'has_archive', // ID
-                'Has Archive', // Title 
-                array($this, 'has_archive_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'has_archive',
+                'Has Archive',
+                array($this, 'has_archive_callback'),
+                'cpt-generator',
+                'cpt_setting_section'           
         );
 
         add_settings_field(
-                'supports', // ID
-                'Supports Type', // Title 
-                array($this, 'support_callback'), // Callback
-                'cpt-generator', // Page
-                'cpt_setting_section' // Section           
+                'supports',
+                'Supports Type', 
+                array($this, 'support_callback'),
+                'cpt-generator',
+                'cpt_setting_section'           
         );
     }
 
@@ -195,9 +178,9 @@ class CptSettingsPage {
      *
      * @param array $input Contains all settings fields as array keys
      */
-    public function sanitize($input) {
-        $cpt_option = get_option('cpt_option'); // Get the current options from the db (Edit 
-// Do Add Logic
+    public function sanitize_cpt_options($input) {
+        $cpt_option = get_option('cpt_option'); // Get the current options from the db
+        
         $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
         $cpt_option[$_POST["cpt_post_type"]]["labels_name"] = $_POST["labels_name"];
         $cpt_option[$_POST["cpt_post_type"]]["labels_singular_name"] = isset($_POST["labels_singular_name"]) ? $_POST["labels_singular_name"] : $_POST["cpt_post_type"];
@@ -210,7 +193,7 @@ class CptSettingsPage {
     /**
      * Print the General Section info
      */
-    public function print_section_info() {
+    public function general_section_info() {
         print 'Enter your general cpt settings below:';
     }
 
@@ -294,7 +277,3 @@ class CptSettingsPage {
     }
 
 }
-
-if (is_admin())
-    $cpt_settings_page = new CptSettingsPage();
-require_once(plugin_dir_path(__FILE__) . 'ct.php');
