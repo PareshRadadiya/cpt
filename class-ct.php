@@ -278,6 +278,7 @@ class CtSettings {
             <?php
         }
     }
+    
 
 }
     
