@@ -15,15 +15,13 @@ if (is_admin()) {
     $cpt_settings = new CptSettings();
     $ct_settings = new CtSettings();
 
-    $cpt_helper_tabs;
-
     $cpt_helper_tabs = array(
         'cpt' => array(
-            'menu_title' => __('CPT', 'nginx-helper'),
+            'menu_title' => __('Post Type', 'nginx-helper'),
             'menu_slug' => 'cpt'
         ),
         'ct' => array(
-            'menu_title' => __('CT', 'nginx-helper'),
+            'menu_title' => __('Taxonomy', 'nginx-helper'),
             'menu_slug' => 'ct'
     ));
     //include class file for custom post type and custom taxonomy
@@ -38,13 +36,9 @@ if (is_admin()) {
         add_options_page('CPT Generator', 'CPT Generator', 'manage_options', 'cpt-generator', 'cpt_create_admin_page');
     }
 
-    //instance of custom post type class
-    //instance of custom taxonomy class
-    //  $ct_settings = new CtSettings();
-
     function cpt_create_admin_page() {
-        wp_register_style('cpt_switch_style', plugin_dir_path(__FILE__) . '/css/switch.css');
-        wp_register_style('cpt_style', plugin_dir_path(__FILE__) . '/css/style.css');
+        wp_register_style('cpt_switch_style', plugins_url('', __FILE__) . '/css/switch.css');
+        wp_register_style('cpt_style',plugins_url('', __FILE__) . '/css/style.css');
         wp_enqueue_style('cpt_switch_style');
         wp_enqueue_style('cpt_style');
 
@@ -54,7 +48,6 @@ if (is_admin()) {
             <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-2">
                     <div id="post-body-content">
-                         
                         <?php
                         /* Show Tabs */
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['tab'])) {
@@ -62,30 +55,23 @@ if (is_admin()) {
                         } else {
                             cpt_admin_page_tabs('cpt');
                         }
-
                         /* Fetch Page Content */
                         $current = isset($_GET['tab']) ? $_GET['tab'] : 'cpt';
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['page'])) {
                             switch ($current) {
                                 case 'cpt' :
-                                   
-                                   
-                                    $cpt_settings->add_field();
                                     $cpt_settings->add_cpt_section();
-                                   
                                     break;
                                 case 'ct' :
-                                   
-                                      $ct_settings->add_field();
-                                      $ct_settings->add_ct_section();
-                                  
+                                    $ct_settings->add_ct_section();
+
                                     break;
                             }
                         }
                         ?>
-            
+
                     </div> <!-- End of #post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();         ?>
+                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();          ?>
                     </div> <!-- End of #postbox-container-1 -->
                 </div> <!-- End of #post-body -->
             </div> <!-- End of #poststuff -->

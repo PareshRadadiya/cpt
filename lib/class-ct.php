@@ -69,7 +69,9 @@ class CtSettings {
      * Options page callback
      */
     public function add_ct_section() {
+        
         $this->options = get_option('ct_option');
+        $this->add_ct_field();
         ?>
         <form method="post" action="options.php">
             <div class="inside">
@@ -122,7 +124,7 @@ class CtSettings {
         );
     }
 
-    public function add_field() {
+    public function add_ct_field() {
         add_settings_section(
                 'ct_setting_section', // ID
                 'General Settings', // Title
