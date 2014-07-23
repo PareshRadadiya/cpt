@@ -1,22 +1,21 @@
 <?php
+
 /**
  * Class for custom taxonomy plugin support
  */
 class CtSettings {
 
-    private $options, $dir, $editval;
+    public $options, $dir, $editval;
 
     public function __construct() {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
-        add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
-
+        
         /*
          * delete or edit ct
          */
-        if (isset($_GET["page"]) && $_GET["page"] == "ct-generator") {
+        if (isset($_GET["page"]) && $_GET["page"] == "cpt-generator") {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["ct_name"]]);
                 update_option("ct_option", $this->options);
@@ -61,30 +60,26 @@ class CtSettings {
      * Add options page
      */
     public function add_ct_plugin_page() {
-        add_options_page('CT Generator', 'CT Generator', 'manage_options', 'ct-generator', array($this, 'create_ct_page'));
+        add_options_page('CT Generator', 'CT Generator', 'manage_options', 'cpt-generator', array($this, 'create_ct_page'));
     }
 
     /**
      * Options page callback
      */
-    public function create_ct_page() {
+    public function add_ct_section() {
         $this->options = get_option('ct_option');
-        wp_register_style('ct_generator_style', $this->dir . '/css/switch.css');
-        wp_enqueue_style('ct_generator_style');
         ?>
-        <div class="wrap">
-
-            <h2>CT Generator</h2>           
-            <form method="post" action="options.php">
+        <form method="post" action="options.php">
+            <div class="inside">
                 <?php
                 // This prints out all hidden setting fields
                 settings_fields('ct_option_group');
-                do_settings_sections('ct-generator');
+                do_settings_sections('cpt-generator');
                 submit_button();
                 ?>
+            </div>
+        </form>
 
-            </form>
-        </div>
         <?php if ($this->options) { ?>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
@@ -93,7 +88,7 @@ class CtSettings {
                 <th class="manage-column">Label</th>
             </thead>
             <tbody>
-                <?php foreach ($this->options as $value) { ?>
+            <?php foreach ($this->options as $value) { ?>
                     <tr>
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['ct_name']; ?></a></strong>
@@ -106,7 +101,7 @@ class CtSettings {
                         </td>
                         <td><?php echo $value['ct_singular_name']; ?></td>
                     </tr>
-                <?php } ?>
+            <?php } ?>
             </tbody>
             </table>
             <?php
@@ -127,54 +122,30 @@ class CtSettings {
                 'ct_setting_section', // ID
                 'General Settings', // Title
                 array($this, 'general_section_info'), // Callback
-                'ct-generator' // Page
+                'cpt-generator' // Page
         );
 
         add_settings_field(
-                'ct_name',
-                'Label Name',
-                array($this, 'name_callback'),
-                'ct-generator',
-                'ct_setting_section'     
+                'ct_name', 'Label Name', array($this, 'name_callback'), 'cpt-generator', 'ct_setting_section'
         );
 
         add_settings_field(
-                'ct_singular_name',
-                'Singular Name',
-                array($this, 'singular_name_callback'),
-                'ct-generator',
-                'ct_setting_section'
+                'ct_singular_name', 'Singular Name', array($this, 'singular_name_callback'), 'cpt-generator', 'ct_setting_section'
         );
 
         add_settings_field(
-                'ct_hierarchical',
-                'Hierarchical',
-                array($this, 'hierarchical_callback'),
-                'ct-generator',
-                'ct_setting_section'
-        );
-        
-        add_settings_field(
-                'ct_show_ui',
-                'Show UI',
-                array($this, 'show_ui_callback'),
-                'ct-generator',
-                'ct_setting_section'
-        );
-        add_settings_field(
-                'ct_show_admin_column',
-                'Show Admin Column',
-                array($this, 'show_admin_column_callback'),
-                'ct-generator',
-                'ct_setting_section'
+                'ct_hierarchical', 'Hierarchical', array($this, 'hierarchical_callback'), 'cpt-generator', 'ct_setting_section'
         );
 
         add_settings_field(
-                'post_types',
-                'Post Type',
-                array($this, 'post_types_callback'),
-                'ct-generator',
-                'ct_setting_section'
+                'ct_show_ui', 'Show UI', array($this, 'show_ui_callback'), 'cpt-generator', 'ct_setting_section'
+        );
+        add_settings_field(
+                'ct_show_admin_column', 'Show Admin Column', array($this, 'show_admin_column_callback'), 'cpt-generator', 'ct_setting_section'
+        );
+
+        add_settings_field(
+                'post_types', 'Post Type', array($this, 'post_types_callback'), 'cpt-generator', 'ct_setting_section'
         );
     }
 
@@ -192,7 +163,7 @@ class CtSettings {
         $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
         $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
 
- 
+
         return $ct_option;
     }
 
@@ -236,33 +207,35 @@ class CtSettings {
 
         <?php
     }
+
     /**
      * Show UI option callback
      */
     public function show_ui_callback() {
         ?>
-                <div class="onoffswitch">
-                    <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
-                    <label class="onoffswitch-label" for="ct_show_ui">
-                        <span class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="ct_show_ui">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
 
         <?php
     }
+
     /**
      * Show in admin column option callback
      */
     public function show_admin_column_callback() {
         ?>
-                <div class="onoffswitch">
-                    <input type="checkbox" name="ct_show_admin_column" id="ct_show_admin_column" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_admin_column'], true) : "checked"; ?>>
-                    <label class="onoffswitch-label" for="ct_show_admin_column">
-                        <span class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_show_admin_column" id="ct_show_admin_column" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_admin_column'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="ct_show_admin_column">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
 
         <?php
     }
@@ -278,7 +251,5 @@ class CtSettings {
             <?php
         }
     }
-    
 
 }
-    

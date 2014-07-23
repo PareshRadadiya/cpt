@@ -11,9 +11,7 @@ class CptSettings {
         $this->options = get_option('cpt_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        add_action('admin_menu', array($this, 'add_cpt_plugin_page')); //Add menu inside setting for Generator
-        add_action('admin_init', array($this, 'cpt_page_init')); // Set setting page for CPT Generator
-
+      
         /*
          * delete or edit cpt 
          */
@@ -27,7 +25,7 @@ class CptSettings {
         }
 
         add_action('init', array($this, 'register_cpt')); //Register all CPT added using this plugin
-        add_action('admin_init',  array($this,'add_cpt_caps'));
+        add_action('admin_init', array($this, 'add_cpt_caps'));
     }
 
     function add_cpt_caps() {
@@ -104,29 +102,24 @@ class CptSettings {
     /**
      * Options page callback
      */
-    function create_cpt_page() {
+    function add_cpt_section() {
         $this->options = get_option('cpt_option');
-        wp_register_style('cpt_generator_style', $this->dir . '/css/switch.css');
-        wp_enqueue_style('cpt_generator_style');
+       
         ?>
-        <div class="postbox">
 
-            <h3 class="hndle">
-                <span><?php _e('CPT Generator', ''); ?></span>
-            </h3>  
+        <form method="post" action="options.php"  class="clearfix">
             <div class="inside">
-                <form method="post" action="options.php">
-                    <?php
-                    // This prints out all hidden setting fields
-                    settings_fields('cpt_option_group');
-                    do_settings_sections('cpt-generator');
-                    submit_button();
-                    ?>
-
-                </form>
+                <?php
+                //wp_nonce_field('cpt_save_options', 'save_options');
+                // This prints out all hidden setting fields
+               
+                settings_fields('cpt_option_group');
+                do_settings_sections('cpt-generator');
+                submit_button();
+                ?>
             </div>
+        </form>
 
-        </div>
         <?php if ($this->options) { ?>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
@@ -236,11 +229,11 @@ class CptSettings {
         add_settings_field(
                 'cpt_taxonomies', 'Built in Taxonomies', array($this, 'cpt_taxonomies_callback'), 'cpt-generator', 'cpt_setting_section'
         );
-        
+
         add_settings_field(
                 'cpt_has_archive', 'Has Archive', array($this, 'cpt_has_archive_callback'), 'cpt-generator', 'cpt_setting_section'
         );
-        
+
 
         add_settings_field(
                 'cpt_supports', 'Supports Type', array($this, 'support_callback'), 'cpt-generator', 'cpt_setting_section'
@@ -253,25 +246,29 @@ class CptSettings {
      * @param array $input Contains all settings fields as array keys
      */
     function sanitize_cpt_options($input) {
-        $cpt_option = get_option('cpt_option'); // Get the current options from the db
-
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = isset($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = isset($_POST["cpt_description"]) ? $_POST["cpt_description"] : "";
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = isset($_POST["cpt_menu_position"]) ? $_POST["cpt_menu_position"] : "";
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ?  $_POST["cpt_taxonomies"] : array('');
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
-        return $cpt_option;
+        if (!empty($_POST) && check_admin_referer('cpt_save_options', 'save_options')) {
+            $cpt_option = get_option('cpt_option'); // Get the current options from the db
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = isset($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = isset($_POST["cpt_description"]) ? $_POST["cpt_description"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = isset($_POST["cpt_menu_position"]) ? $_POST["cpt_menu_position"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
+            return $cpt_option;
+        } else {
+            print 'Sorry, your nonce did not verify.';
+            exit;
+        }
     }
 
     /**
@@ -477,8 +474,8 @@ class CptSettings {
 
         <?php
     }
-    
-        /**
+
+    /**
      * Public visibility option callback
      */
     function cpt_taxonomies_callback() {
@@ -487,7 +484,7 @@ class CptSettings {
         <input type="checkbox"  name="cpt_taxonomies[]"  value="post_tag"  <?php isset($this->editval) ? checked(in_array("post_tag", $this->editval["cpt_taxonomies"]), true) : ""; ?>/> Tag<br/>
         <?php
     }
-    
+
     /**
      * Achive option callback
      */
