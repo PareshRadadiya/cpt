@@ -17,7 +17,7 @@ class CptSettings {
         /*
          * delete or edit cpt 
          */
-        if (isset($_GET["page"]) && $_GET["page"] == "cpt-generator") {
+        if ((isset($_GET["tab"]) && $_GET["tab"] == "cpt") || (!isset($_GET["tab"]) && $_GET["page"]=="cpt-generator")) {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["cpt_post_type"]]);
                 update_option("cpt_option", $this->options);
@@ -249,7 +249,7 @@ class CptSettings {
      * @param array $input Contains all settings fields as array keys
      */
     function sanitize_cpt_options($input) {
-        if (!empty($_POST) && check_admin_referer('cpt_save_options', 'save_options')) {
+       
             $cpt_option = get_option('cpt_option'); // Get the current options from the db
             $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
             $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
@@ -268,10 +268,7 @@ class CptSettings {
             $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
             return $cpt_option;
-        } else {
-            print 'Sorry, your nonce did not verify.';
-            exit;
-        }
+       
     }
 
     /**

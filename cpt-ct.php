@@ -54,8 +54,7 @@ if (is_admin()) {
             <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-2">
                     <div id="post-body-content">
-                         <form method="post" action="options.php">
-            <div class="inside">
+                         
                         <?php
                         /* Show Tabs */
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['tab'])) {
@@ -70,21 +69,21 @@ if (is_admin()) {
                             switch ($current) {
                                 case 'cpt' :
                                    
-                                    settings_fields('cpt_option_group');
+                                   
                                     $cpt_settings->add_field();
-                                    do_settings_sections('cpt-generator');
-                                   submit_button();
+                                    $cpt_settings->add_cpt_section();
+                                   
                                     break;
                                 case 'ct' :
-                                    settings_fields('ct_option_group');
+                                   
                                       $ct_settings->add_field();
-                                    do_settings_sections('cpt-generator');
-                                    submit_button();
+                                      $ct_settings->add_ct_section();
+                                  
                                     break;
                             }
                         }
                         ?>
-            </div></form>
+            
                     </div> <!-- End of #post-body-content -->
                     <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();         ?>
                     </div> <!-- End of #postbox-container-1 -->

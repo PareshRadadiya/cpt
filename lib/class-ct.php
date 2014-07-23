@@ -17,7 +17,7 @@ class CtSettings {
         /*
          * delete or edit ct
          */
-        if (isset($_GET["page"]) && $_GET["page"] == "cpt-generator") {
+        if (isset($_GET["tab"]) && $_GET["tab"] == "ct") {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["ct_name"]]);
                 update_option("ct_option", $this->options);
