@@ -11,7 +11,9 @@ class CptSettings {
         $this->options = get_option('cpt_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-      
+        // add_action('admin_menu', array($this, 'add_cpt_plugin_tab')); //Add menu inside setting for Generator
+        add_action('admin_init', array($this, 'cpt_page_init')); // Set setting page for CPT Generator
+
         /*
          * delete or edit cpt 
          */
@@ -104,7 +106,6 @@ class CptSettings {
      */
     function add_cpt_section() {
         $this->options = get_option('cpt_option');
-       
         ?>
 
         <form method="post" action="options.php"  class="clearfix">
@@ -112,7 +113,7 @@ class CptSettings {
                 <?php
                 //wp_nonce_field('cpt_save_options', 'save_options');
                 // This prints out all hidden setting fields
-               
+
                 settings_fields('cpt_option_group');
                 do_settings_sections('cpt-generator');
                 submit_button();
@@ -158,7 +159,9 @@ class CptSettings {
                 'cpt_option', // Option name
                 array($this, 'sanitize_cpt_options')
         );
+    }
 
+    public function add_field() {
         add_settings_section(
                 'cpt_setting_section', // ID
                 'General Settings', // Title

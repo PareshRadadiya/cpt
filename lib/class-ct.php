@@ -11,7 +11,9 @@ class CtSettings {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        
+        // add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
+        add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
+
         /*
          * delete or edit ct
          */
@@ -72,10 +74,11 @@ class CtSettings {
         <form method="post" action="options.php">
             <div class="inside">
                 <?php
-                // This prints out all hidden setting fields
                 settings_fields('ct_option_group');
                 do_settings_sections('cpt-generator');
                 submit_button();
+
+                // This prints out all hidden setting fields
                 ?>
             </div>
         </form>
@@ -88,7 +91,7 @@ class CtSettings {
                 <th class="manage-column">Label</th>
             </thead>
             <tbody>
-            <?php foreach ($this->options as $value) { ?>
+                <?php foreach ($this->options as $value) { ?>
                     <tr>
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['ct_name']; ?></a></strong>
@@ -101,7 +104,7 @@ class CtSettings {
                         </td>
                         <td><?php echo $value['ct_singular_name']; ?></td>
                     </tr>
-            <?php } ?>
+                <?php } ?>
             </tbody>
             </table>
             <?php
@@ -117,7 +120,9 @@ class CtSettings {
                 'ct_option', // Option name
                 array($this, 'sanitize_ct_options')
         );
+    }
 
+    public function add_field() {
         add_settings_section(
                 'ct_setting_section', // ID
                 'General Settings', // Title

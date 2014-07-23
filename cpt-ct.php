@@ -53,7 +53,10 @@ if (is_admin()) {
             <h2 class="rt_option_title"><?php _e('Custom Post Type and Taxonomy', 'nginx-helper'); ?></h2>
             <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-2">
-                    <div id="post-body-content"><?php
+                    <div id="post-body-content">
+                         <form method="post" action="options.php">
+            <div class="inside">
+                        <?php
                         /* Show Tabs */
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['tab'])) {
                             cpt_admin_page_tabs($_GET['tab']);
@@ -66,18 +69,24 @@ if (is_admin()) {
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['page'])) {
                             switch ($current) {
                                 case 'cpt' :
-                                    $cpt_settings->cpt_page_init();
-                                    $cpt_settings->add_cpt_section();
+                                   
+                                    settings_fields('cpt_option_group');
+                                    $cpt_settings->add_field();
+                                    do_settings_sections('cpt-generator');
+                                   submit_button();
                                     break;
                                 case 'ct' :
-                                     $ct_settings->ct_page_init();
-                                    $ct_settings->add_ct_section();
+                                    settings_fields('ct_option_group');
+                                      $ct_settings->add_field();
+                                    do_settings_sections('cpt-generator');
+                                    submit_button();
                                     break;
                             }
                         }
                         ?>
+            </div></form>
                     </div> <!-- End of #post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();    ?>
+                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();         ?>
                     </div> <!-- End of #postbox-container-1 -->
                 </div> <!-- End of #post-body -->
             </div> <!-- End of #poststuff -->
