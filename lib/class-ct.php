@@ -69,22 +69,26 @@ class CtSettings {
      * Options page callback
      */
     public function add_ct_section() {
-        
+
         $this->options = get_option('ct_option');
         $this->add_ct_field();
         ?>
-        <form method="post" action="options.php">
-            <div class="inside">
-                <?php
-                settings_fields('ct_option_group');
-                do_settings_sections('cpt-generator');
-                submit_button();
+        <div class="postbox">
+            <h3 class="hndle">
+                <span><?php _e('Generate Taxonomy'); ?></span>
+            </h3>
+            <form method="post" action="options.php">
+                <div class="inside">
+                    <?php
+                    settings_fields('ct_option_group');
+                    do_settings_sections('cpt-generator');
+                    submit_button();
 
-                // This prints out all hidden setting fields
-                ?>
-            </div>
-        </form>
-
+                    // This prints out all hidden setting fields
+                    ?>
+                </div>
+            </form>
+        </div>
         <?php if ($this->options) { ?>
             <table class="wp-list-table widefat fixed pages">
                 <thead>

@@ -17,12 +17,14 @@ class CptSettings {
         /*
          * delete or edit cpt 
          */
-        if ((isset($_GET["tab"]) && $_GET["tab"] == "cpt") || (!isset($_GET["tab"]) && $_GET["page"] == "cpt-generator")) {
+        if ((isset($_GET["tab"]) && $_GET["tab"] == "cpt") || (!isset($_GET["tab"]) && isset($_GET["page"]) && $_GET["page"] == "cpt-generator")) {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["cpt_post_type"]]);
                 update_option("cpt_option", $this->options);
+                header("location: options-general.php?page=cpt-generator&tab=cpt");
             } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
                 $this->editval = $this->options[$_GET["cpt_post_type"]];
+                //header("location: options-general.php?page=cpt-generator&tab=cpt");
             }
         }
 
@@ -105,24 +107,27 @@ class CptSettings {
      * Options page callback
      */
     function add_cpt_section() {
-       
+
         $this->options = get_option('cpt_option');
         $this->add_cpt_field()
         ?>
+        <div class="postbox">
+            <h3 class="hndle">
+                <span><?php _e('Generate Post Type'); ?></span>
+            </h3>
+            <form method="post" action="options.php"  class="clearfix">
+                <div class="inside">
+                    <?php
+                    //wp_nonce_field('cpt_save_options', 'save_options');
+                    // This prints out all hidden setting fields
 
-        <form method="post" action="options.php"  class="clearfix">
-            <div class="inside">
-                <?php
-                //wp_nonce_field('cpt_save_options', 'save_options');
-                // This prints out all hidden setting fields
-
-                settings_fields('cpt_option_group');
-                do_settings_sections('cpt-generator');
-                submit_button();
-                ?>
-            </div>
-        </form>
-
+                    settings_fields('cpt_option_group');
+                    do_settings_sections('cpt-generator');
+                    submit_button();
+                    ?>
+                </div>
+            </form>
+        </div>
         <?php if ($this->options) { ?>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
@@ -136,9 +141,9 @@ class CptSettings {
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
                             <div class="row-actions">
-                                <span class="edit"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
+                                <span class="edit"><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                <span class="trash"><a class="submitdelete" href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=cpt&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
 
                             </div>
                         </td>
