@@ -21,6 +21,7 @@ class CtSettings {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["ct_name"]]);
                 update_option("ct_option", $this->options);
+                 header("location: options-general.php?page=cpt-generator&tab=ct");
             } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
                 $this->editval = $this->options[$_GET["ct_name"]];
             }
@@ -47,9 +48,11 @@ class CtSettings {
                     'hierarchical' => $value['ct_hierarchical'],
                     'labels' => $labels,
                     'show_ui' => $value['ct_show_ui'],
+                    'show_in_nav_menus' => $value['ct_show_in_nav_menus'],
+                    'show_tagcloud' => $value['ct_show_tagcloud'],
                     'show_admin_column' => $value['ct_show_admin_column'],
                     'update_count_callback' => '_update_post_term_count',
-                    'query_var' => true,
+                    'query_var' => $value['ct_query_var'],
                     'rewrite' => array('slug' => $value['ct_name']),
                 );
 
@@ -73,6 +76,7 @@ class CtSettings {
         $this->options = get_option('ct_option');
         $this->add_ct_field();
         ?>
+        <a class="button button-primary" href="options-general.php?page=cpt-generator&tab=ct">Add New</a><hr/>
         <div class="postbox">
             <h3 class="hndle">
                 <span><?php _e('Generate Taxonomy'); ?></span>
@@ -83,8 +87,6 @@ class CtSettings {
                     settings_fields('ct_option_group');
                     do_settings_sections('cpt-generator');
                     submit_button();
-
-                    // This prints out all hidden setting fields
                     ?>
                 </div>
             </form>
@@ -102,9 +104,9 @@ class CtSettings {
                         <td class="post-title page-title column-title">
                             <strong><a><?php echo $value['ct_name']; ?></a></strong>
                             <div class="row-actions">
-                                <span class="edit"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
+                                <span class="edit"><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                <span class="trash"><a class="submitdelete" href="<?php echo $_SERVER['REQUEST_URI']; ?>&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=ct&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
 
                             </div>
                         </td>
@@ -151,8 +153,20 @@ class CtSettings {
         add_settings_field(
                 'ct_show_ui', 'Show UI', array($this, 'show_ui_callback'), 'cpt-generator', 'ct_setting_section'
         );
+
+        add_settings_field(
+                'ct_show_in_nav_menus', 'Show In Nav Menu', array($this, 'ct_show_in_nav_menus_callback'), 'cpt-generator', 'ct_setting_section'
+        );
+
+        add_settings_field(
+                'ct_show_tagcloud', 'Show Tag Cloud', array($this, 'ct_show_tagcloud_callback'), 'cpt-generator', 'ct_setting_section'
+        );
         add_settings_field(
                 'ct_show_admin_column', 'Show Admin Column', array($this, 'show_admin_column_callback'), 'cpt-generator', 'ct_setting_section'
+        );
+
+        add_settings_field(
+                'ct_query_var', 'Query Var', array($this, 'ct_query_var_callback'), 'cpt-generator', 'ct_setting_section'
         );
 
         add_settings_field(
@@ -171,9 +185,11 @@ class CtSettings {
         $ct_option[$_POST["ct_name"]]["ct_singular_name"] = $_POST["ct_singular_name"];
         $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
         $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
+        $ct_option[$_POST["ct_name"]]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;
+        $ct_option[$_POST["ct_name"]]["ct_show_tagcloud"] = isset($_POST["ct_show_tagcloud"]) ? true : false;
         $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
+        $ct_option[$_POST["ct_name"]]["ct_query_var"] = isset($_POST["ct_query_var"]) ? true : false;
         $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
-
 
         return $ct_option;
     }
@@ -211,8 +227,10 @@ class CtSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="ct_hierarchical" id="ct_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['ct_hierarchical'], true) : ""; ?>>
             <label class="onoffswitch-label" for="ct_hierarchical">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                 <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
 
@@ -227,8 +245,46 @@ class CtSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
             <label class="onoffswitch-label" for="ct_show_ui">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                 <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    /**
+     * Show UI option callback
+     */
+    public function ct_show_in_nav_menus_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_show_in_nav_menus" id="ct_show_in_nav_menus" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_in_nav_menus'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="ct_show_in_nav_menus">
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    /**
+     * Show UI option callback
+     */
+    public function ct_show_tagcloud_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_show_tagcloud" id="ct_show_tagcloud" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_tagcloud'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="ct_show_tagcloud">
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
 
@@ -243,8 +299,28 @@ class CtSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="ct_show_admin_column" id="ct_show_admin_column" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_admin_column'], true) : "checked"; ?>>
             <label class="onoffswitch-label" for="ct_show_admin_column">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    /**
+     * Show in admin column option callback
+     */
+    public function ct_query_var_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="ct_query_var" id="ct_query_var" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_query_var'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="ct_query_var">
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
 

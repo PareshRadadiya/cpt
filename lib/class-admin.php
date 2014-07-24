@@ -49,6 +49,9 @@ class admin {
                         } else {
                             $this->cpt_admin_page_tabs('cpt');
                         }
+                        ?>
+                       
+                        <?php
                         /* Fetch Page Content */
                         $current = isset($_GET['tab']) ? $_GET['tab'] : 'cpt';
                         if (( 'options-general.php' == $pagenow || 'settings.php' == $pagenow ) && isset($_GET['page'])) {
@@ -64,7 +67,7 @@ class admin {
                         ?>
 
                     </div> <!-- End of #post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();                    ?>
+                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();                     ?>
                     </div> <!-- End of #postbox-container-1 -->
                 </div> <!-- End of #post-body -->
             </div> <!-- End of #poststuff -->

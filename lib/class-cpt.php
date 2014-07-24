@@ -17,6 +17,7 @@ class CptSettings {
         /*
          * delete or edit cpt 
          */
+
         if ((isset($_GET["tab"]) && $_GET["tab"] == "cpt") || (!isset($_GET["tab"]) && isset($_GET["page"]) && $_GET["page"] == "cpt-generator")) {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["cpt_post_type"]]);
@@ -24,7 +25,6 @@ class CptSettings {
                 header("location: options-general.php?page=cpt-generator&tab=cpt");
             } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
                 $this->editval = $this->options[$_GET["cpt_post_type"]];
-                //header("location: options-general.php?page=cpt-generator&tab=cpt");
             }
         }
 
@@ -111,6 +111,7 @@ class CptSettings {
         $this->options = get_option('cpt_option');
         $this->add_cpt_field()
         ?>
+        <a class="button button-primary" href="options-general.php?page=cpt-generator&tab=cpt">Add New</a><hr/>
         <div class="postbox">
             <h3 class="hndle">
                 <span><?php _e('Generate Post Type'); ?></span>
@@ -256,7 +257,6 @@ class CptSettings {
      * @param array $input Contains all settings fields as array keys
      */
     function sanitize_cpt_options($input) {
-
         $cpt_option = get_option('cpt_option'); // Get the current options from the db
         $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
         $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
@@ -328,8 +328,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_public" id="cpt_public" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_public'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_public">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -343,8 +345,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_exclude_from_search" id="cpt_exclude_from_search" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_exclude_from_search'], true) : ""; ?> >
             <label class="onoffswitch-label" for="cpt_exclude_from_search">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+               <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -358,8 +362,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_publicly_queryable" id="cpt_publicly_queryable" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_publicly_queryable'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_publicly_queryable">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -373,8 +379,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_show_ui" id="cpt_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_ui'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_show_ui">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -388,8 +396,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_show_in_nav_menus" id="cpt_show_in_nav_menus" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_nav_menus'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_show_in_nav_menus">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -403,8 +413,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_show_in_menu" id="cpt_show_in_menu" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_menu'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_show_in_menu">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -418,8 +430,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_show_in_admin_bar" id="cpt_show_in_admin_bar" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_admin_bar'], true) : "checked"; ?> >
             <label class="onoffswitch-label" for="cpt_show_in_admin_bar">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
         <?php
@@ -473,8 +487,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_hierarchical" id="cpt_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['cpt_hierarchical'], true) : ""; ?>>
             <label class="onoffswitch-label" for="cpt_hierarchical">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                 <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
 
@@ -499,8 +515,10 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_has_archive" id="cpt_has_archive" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['cpt_has_archive'], true) : ""; ?>>
             <label class="onoffswitch-label" for="cpt_has_archive">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
             </label>
         </div>
 
