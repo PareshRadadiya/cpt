@@ -126,13 +126,17 @@ class CptSettings {
                 <th class="manage-column">Post Name</th>
                 <th class="manage-column">Public</th>
                 <th class="manage-column">Label</th>
+                <th class="manage-column">Description</th>
+                <th class="manage-column">Icon</th>
             </thead>
             <tbody>
                 <?php
                 if ($this->options) {
+                    $index = 1;
                     foreach ($this->options as $value) {
                         ?>
-                        <tr>
+                        <tr class="<?php echo ($index % 2) ? "alternate" : "" ?>">
+                           
                             <td class="post-title page-title column-title">
                                 <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
                                 <div class="row-actions">
@@ -144,16 +148,32 @@ class CptSettings {
                             </td>
                             <td><?php echo $value['cpt_public'] ? "True" : "False"; ?></td>
                             <td><?php echo $value['cpt_labels_name']; ?></td>
+                            <td><?php echo $value['cpt_description']; ?></td>
+                             <td>
+                                <?php if (!empty($value['cpt_menu_icon'])) { ?>
+                                    <img src="<?php echo $value['cpt_menu_icon']; ?>" width="16" height="16" />
+                                <?php }else{?>
+                                    <div class="dashicons-before dashicons-admin-post"></div>
+                               <?php } ?>
+                            </td>
                         </tr>
                         <?php
+                        $index++;
                     }
                 } else {
                     ?>
-                    <tr class="no-items"><td class="colspanchange" colspan="3">No custom posts found created using this plugin.</td></tr>
+                    <tr class="no-items"><td class="colspanchange" colspan="5">No custom posts found created using this plugin.</td></tr>
                     <?php
                 }
                 ?>
             </tbody>
+            <tfoot>
+            <th class="manage-column">Post Name</th>
+            <th class="manage-column">Public</th>
+            <th class="manage-column">Label</th>
+            <th class="manage-column">Description</th>
+            <th class="manage-column">Icon</th>
+            </tfoot>
             </table>
             <?php
         }

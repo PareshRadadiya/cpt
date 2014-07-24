@@ -1,6 +1,7 @@
 <?php
 require_once(plugin_dir_path(__FILE__) . 'class-cpt.php');
 require_once(plugin_dir_path(__FILE__) . 'class-ct.php');
+require_once(plugin_dir_path(__FILE__) . 'cpt-sidebar.php');
 
 class admin {
 
@@ -67,7 +68,7 @@ class admin {
                         ?>
 
                     </div> <!-- End of #post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();                               ?>
+                    <div id="postbox-container-1" class="postbox-container"><?php default_admin_sidebar();                               ?>
                     </div> <!-- End of #postbox-container-1 -->
                 </div> <!-- End of #post-body -->
             </div> <!-- End of #poststuff -->

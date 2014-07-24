@@ -38,7 +38,7 @@ class CtSettings {
         if ($this->options) {
             foreach ($this->options as $value) {
                 $labels = array(
-                    'name' => _x($value['ct_name'], 'taxonomy general name'),
+                    'name' => _x($value['ct_label_name'], 'taxonomy general name'),
                     'singular_name' => _x($value['ct_singular_name'], 'taxonomy singular name')
                 );
 
@@ -99,13 +99,16 @@ class CtSettings {
                 <th class="manage-column">Name</th>
 
                 <th class="manage-column">Label</th>
+                <th class="manage-column">Show UI</th>
+
             </thead>
             <tbody>
                 <?php
                 if ($this->options) {
+                    $index = 1;
                     foreach ($this->options as $value) {
                         ?>
-                        <tr>
+                        <tr class="<?php echo ($index % 2) ? "alternate" : "" ?>">
                             <td class="post-title page-title column-title">
                                 <strong><a><?php echo $value['ct_name']; ?></a></strong>
                                 <div class="row-actions">
@@ -115,17 +118,24 @@ class CtSettings {
 
                                 </div>
                             </td>
-                            <td><?php echo $value['ct_singular_name']; ?></td>
+                            <td><?php echo $value['ct_label_name']; ?></td>
+                            <td><?php echo $value['ct_show_ui'] ? "True" : "False"; ?></td>
                         </tr>
                         <?php
+                        $index++;
                     }
                 } else {
                     ?>
-                    <tr class="no-items"><td class="colspanchange" colspan="2">No custom taxonomy found created using this plugin.</td></tr>
+                    <tr class="no-items"><td class="colspanchange" colspan="3">No custom taxonomy found created using this plugin.</td></tr>
                     <?php
                 }
                 ?>
             </tbody>
+            <tfoot>
+            <th class="manage-column">Name</th>
+            <th class="manage-column">Label</th>
+            <th class="manage-column">Show UI</th>
+            </tfoot>
             </table>
             <?php
         }
@@ -151,7 +161,11 @@ class CtSettings {
         );
 
         add_settings_field(
-                'ct_name', 'Label Name', array($this, 'name_callback'), 'cpt-generator', 'ct_setting_section'
+                'ct_name', 'Taxonomy Name', array($this, 'name_callback'), 'cpt-generator', 'ct_setting_section'
+        );
+
+        add_settings_field(
+                'ct_label_name', 'Label Name', array($this, 'ct_label_name_callback'), 'cpt-generator', 'ct_setting_section'
         );
 
         add_settings_field(
@@ -195,6 +209,7 @@ class CtSettings {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $ct_option = get_option('ct_option'); // Get the current options from the db
             $ct_option[$_POST["ct_name"]]["ct_name"] = sanitize_text_field($_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_label_name"] = sanitize_text_field(!empty($_POST["ct_label_name"]) ? $_POST["ct_label_name"] : $_POST["ct_name"]);
             $ct_option[$_POST["ct_name"]]["ct_singular_name"] = sanitize_text_field(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $_POST["ct_name"]);
             $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
             $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
@@ -221,6 +236,15 @@ class CtSettings {
     public function name_callback() {
         ?>
         <input type="text" name="ct_name" required="" value="<?php echo isset($this->editval) ? $this->editval['ct_name'] : "" ?>" />
+        <?php
+    }
+
+    /**
+     * Label name option callback
+     */
+    public function ct_label_name_callback() {
+        ?>
+        <input type="text" name="ct_label_name"  value="<?php echo isset($this->editval) ? $this->editval['ct_label_name'] : "" ?>" />
         <?php
     }
 
