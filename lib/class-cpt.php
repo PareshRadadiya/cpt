@@ -29,7 +29,7 @@ class CptSettings {
         }
 
         add_action('init', array($this, 'register_cpt')); //Register all CPT added using this plugin
-        add_action('admin_init', array($this, 'add_cpt_caps'));
+        // add_action('admin_init', array($this, 'add_cpt_caps'));
     }
 
     function add_cpt_caps() {
@@ -45,6 +45,8 @@ class CptSettings {
                 $admins->add_cap("read_{$slug}");
                 $admins->add_cap("read_private_{$slug}s");
                 $admins->add_cap("delete_{$slug}");
+                $admins->add_cap("delete_published_{$slug}s");
+                $admins->add_cap("delete_{$slug}s");
             }
         }
     }
@@ -70,28 +72,16 @@ class CptSettings {
                     'show_in_menu' => $value['cpt_show_in_menu'],
                     'show_in_admin_bar' => $value['cpt_show_in_admin_bar'],
                     'menu_position' => intval($value['cpt_menu_position']),
-                    'capability_type' => $value['cpt_post_type'],
-                    'capabilities' => array(
-                        "publish_posts" => "publish_{$slug}s",
-                        "edit_posts" => "edit_{$slug}s",
-                        "edit_published_posts" => "edit_published_{$slug}s",
-                        "delete_published_posts" => "delete_published_{$slug}s",
-                        "edit_others_posts" => "edit_others_{$slug}s",
-                        "delete_posts" => "delete_{$slug}s",
-                        "delete_others_posts" => "delete_others_{$slug}s",
-                        "read_private_posts" => "read_private_{$slug}s",
-                        "edit_post" => "edit_{$slug}",
-                        "delete_post" => "delete_{$slug}",
-                        "read_post" => "read_{$slug}",
-                    ),
                     'map_meta_cap' => true,
                     'hierarchical' => $value['cpt_hierarchical'],
                     'taxonomies' => $value['cpt_taxonomies'],
                     'has_archive' => $value['cpt_has_archive'],
                     'rewrite' => array('slug' => $value['cpt_post_type']),
-                    'supports' => $value['cpt_supports']
+                    'supports' => $value['cpt_supports'],
+                    'menu_icon' => $value['cpt_menu_icon']
                         )
                 );
+                flush_rewrite_rules();
             }
         }
     }
@@ -119,8 +109,7 @@ class CptSettings {
             <form method="post" action="options.php"  class="clearfix">
                 <div class="inside">
                     <?php
-                    //wp_nonce_field('cpt_save_options', 'save_options');
-                    // This prints out all hidden setting fields
+                    wp_nonce_field('save_options_action', 'save_options_nonce_field');
 
                     settings_fields('cpt_option_group');
                     do_settings_sections('cpt-generator');
@@ -249,6 +238,11 @@ class CptSettings {
         add_settings_field(
                 'cpt_supports', 'Supports Type', array($this, 'support_callback'), 'cpt-generator', 'cpt_setting_section'
         );
+
+
+        add_settings_field(
+                'cpt_menu_icon', 'Menu Icon', array($this, 'cpt_menu_icon_callback'), 'cpt-generator', 'cpt_setting_section'
+        );
     }
 
     /**
@@ -257,24 +251,27 @@ class CptSettings {
      * @param array $input Contains all settings fields as array keys
      */
     function sanitize_cpt_options($input) {
-        $cpt_option = get_option('cpt_option'); // Get the current options from the db
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = isset($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"];
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = isset($_POST["cpt_description"]) ? $_POST["cpt_description"] : "";
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = isset($_POST["cpt_menu_position"]) ? $_POST["cpt_menu_position"] : "";
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
-        $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
-        return $cpt_option;
+        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
+            $cpt_option = get_option('cpt_option'); // Get the current options from the db
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = isset($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = isset($_POST["cpt_description"]) ? $_POST["cpt_description"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = isset($_POST["cpt_menu_position"]) ? $_POST["cpt_menu_position"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = isset($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : null;
+            return $cpt_option;
+        }
     }
 
     /**
@@ -345,7 +342,7 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_exclude_from_search" id="cpt_exclude_from_search" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_exclude_from_search'], true) : ""; ?> >
             <label class="onoffswitch-label" for="cpt_exclude_from_search">
-               <span class="onoffswitch-inner">
+                <span class="onoffswitch-inner">
                     <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
                     <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
                 </span>
@@ -487,7 +484,7 @@ class CptSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="cpt_hierarchical" id="cpt_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['cpt_hierarchical'], true) : ""; ?>>
             <label class="onoffswitch-label" for="cpt_hierarchical">
-                 <span class="onoffswitch-inner">
+                <span class="onoffswitch-inner">
                     <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
                     <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
                 </span>
@@ -541,6 +538,18 @@ class CptSettings {
         <input type="checkbox"  name="cpt_supports[]"  value="revisions"  <?php isset($this->editval) ? checked(in_array("revisions", $this->editval["cpt_supports"]), true) : ""; ?>/> Revisions<br/>
         <input type="checkbox"  name="cpt_supports[]"  value="page-attributes"  <?php isset($this->editval) ? checked(in_array("page-attributes", $this->editval["cpt_supports"]), true) : ""; ?>/> Page Attributes<br/>
         <input type="checkbox"  name="cpt_supports[]"  value="post-formats"  <?php isset($this->editval) ? checked(in_array("post-formats", $this->editval["cpt_supports"]), true) : ""; ?>/> Post Formats<br/>
+        <?php
+    }
+
+    /**
+     * Supports option callbacks
+     */
+    function cpt_menu_icon_callback() {
+        ?>
+        <input id="cpt_menu_icon" type="text" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
+        <input id="choose_cpt_icon" class="button" type="button" value="Choose Image" />
+        <br/>
+        <img id="cpt_menu_icon_thumbnail" src="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" alt="icon not found"/>
         <?php
     }
 

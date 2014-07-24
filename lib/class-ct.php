@@ -21,13 +21,11 @@ class CtSettings {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["ct_name"]]);
                 update_option("ct_option", $this->options);
-                 header("location: options-general.php?page=cpt-generator&tab=ct");
+                header("location: options-general.php?page=cpt-generator&tab=ct");
             } elseif (isset($_GET["editmode"]) && $_GET["editmode"] == "edit") {
                 $this->editval = $this->options[$_GET["ct_name"]];
             }
         }
-
-
 
         add_action('init', array($this, 'register_ct')); //Register all CT added using this plugin
     }
@@ -84,6 +82,7 @@ class CtSettings {
             <form method="post" action="options.php">
                 <div class="inside">
                     <?php
+                    wp_nonce_field('save_options_action', 'save_options_nonce_field');
                     settings_fields('ct_option_group');
                     do_settings_sections('cpt-generator');
                     submit_button();
@@ -227,7 +226,7 @@ class CtSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="ct_hierarchical" id="ct_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['ct_hierarchical'], true) : ""; ?>>
             <label class="onoffswitch-label" for="ct_hierarchical">
-                 <span class="onoffswitch-inner">
+                <span class="onoffswitch-inner">
                     <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
                     <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
                 </span>
@@ -245,7 +244,7 @@ class CtSettings {
         <div class="onoffswitch">
             <input type="checkbox" name="ct_show_ui" id="ct_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['ct_show_ui'], true) : "checked"; ?>>
             <label class="onoffswitch-label" for="ct_show_ui">
-                 <span class="onoffswitch-inner">
+                <span class="onoffswitch-inner">
                     <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
                     <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
                 </span>

@@ -21,6 +21,9 @@ class admin {
         ));
 
         add_action('admin_menu', array($this, 'add_cpt_plugin_page')); //Add menu inside setting for Generator
+
+        add_action('admin_enqueue_scripts', array($this, 'cpt_admin_scripts'));
+        add_action('admin_print_styles', array($this, 'cpt_admin_styles'));
     }
 
     /**
@@ -31,10 +34,7 @@ class admin {
     }
 
     function cpt_create_admin_page() {
-        wp_register_style('cpt_switch_style', plugins_url('cpt') . '/css/switch.css');
-        wp_register_style('cpt_style', plugins_url('cpt') . '/css/style.css');
-        wp_enqueue_style('cpt_switch_style');
-        wp_enqueue_style('cpt_style');
+
 
         global $pagenow;
         ?><div class="wrap rt-cpt-wrapper">
@@ -50,7 +50,7 @@ class admin {
                             $this->cpt_admin_page_tabs('cpt');
                         }
                         ?>
-                       
+
                         <?php
                         /* Fetch Page Content */
                         $current = isset($_GET['tab']) ? $_GET['tab'] : 'cpt';
@@ -67,7 +67,7 @@ class admin {
                         ?>
 
                     </div> <!-- End of #post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();                     ?>
+                    <div id="postbox-container-1" class="postbox-container"><?php //default_admin_sidebar();                               ?>
                     </div> <!-- End of #postbox-container-1 -->
                 </div> <!-- End of #post-body -->
             </div> <!-- End of #poststuff -->
@@ -89,4 +89,25 @@ class admin {
         echo '</h2>';
     }
 
+    function cpt_admin_scripts() {
+        global $pagenow;
+        if ('options-general.php' == $pagenow || 'settings.php' == $pagenow) {
+            wp_register_style('cpt_switch_style', plugins_url('cpt') . '/css/switch.css');
+            wp_enqueue_style('cpt_switch_style');
+            wp_enqueue_media();
+            wp_register_script('cpt-uploader', plugins_url('cpt') . '/js/uploader.js', array('jquery'));
+            wp_enqueue_script('cpt-uploader');
+        }
+    }
+
+    function cpt_admin_styles() {
+        global $pagenow;
+        if ('options-general.php' == $pagenow || 'settings.php' == $pagenow) {
+            wp_register_style('cpt_style', plugins_url('cpt') . '/css/style.css');
+            wp_enqueue_style('cpt_style');
+        }
+    }
+
+    //  add_action('admin_print_scripts', 'my_admin_scripts');
+    // add_action('admin_print_styles', 'my_admin_styles');
 }
