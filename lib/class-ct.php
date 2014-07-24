@@ -11,7 +11,7 @@ class CtSettings {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-// add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
+        
         add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
 
         /*
@@ -67,7 +67,7 @@ class CtSettings {
     }
 
     /**
-     * Options page callback
+     *  section for view all post and add new
      */
     public function add_ct_section() {
 
@@ -142,7 +142,7 @@ class CtSettings {
     }
 
     /**
-     * Register and add settings ,sections and fields
+     * Register and add settings, sections and fields
      */
     public function ct_page_init() {
         register_setting(
@@ -152,6 +152,9 @@ class CtSettings {
         );
     }
 
+    /**
+     * Add a new field to a ct setting section of a settings page
+     */
     public function add_ct_field() {
         add_settings_section(
                 'ct_setting_section', // ID

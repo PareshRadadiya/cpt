@@ -12,7 +12,7 @@ class CptSettings {
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
 
-        add_action('admin_init', array($this, 'cpt_page_init')); // Set setting page for CPT Generator
+        add_action('admin_init', array($this, 'cpt_register_setting')); // Set setting page for CPT Generator
 
         /*
          * delete or edit cpt 
@@ -93,7 +93,7 @@ class CptSettings {
     }
 
     /**
-     * Options page callback
+     * section for view all post and add new
      */
     function add_cpt_section() {
 
@@ -182,7 +182,7 @@ class CptSettings {
     /**
      * Register and add settings ,sections and fields
      */
-    function cpt_page_init() {
+    function cpt_register_setting() {
         register_setting(
                 'cpt_option_group', // Option group
                 'cpt_option', // Option name
@@ -190,6 +190,9 @@ class CptSettings {
         );
     }
 
+    /**
+     *  Add a new field to a cpt setting section of a settings page
+     */
     public function add_cpt_field() {
         add_settings_section(
                 'cpt_setting_section', // ID
