@@ -11,13 +11,12 @@ class CptSettings {
         $this->options = get_option('cpt_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        // add_action('admin_menu', array($this, 'add_cpt_plugin_tab')); //Add menu inside setting for Generator
+
         add_action('admin_init', array($this, 'cpt_page_init')); // Set setting page for CPT Generator
 
         /*
          * delete or edit cpt 
          */
-
         if ((isset($_GET["tab"]) && $_GET["tab"] == "cpt") || (!isset($_GET["tab"]) && isset($_GET["page"]) && $_GET["page"] == "cpt-generator")) {
             if (isset($_GET["editmode"]) && $_GET["editmode"] == "delete") {
                 unset($this->options[$_GET["cpt_post_type"]]);
@@ -99,26 +98,29 @@ class CptSettings {
     function add_cpt_section() {
 
         $this->options = get_option('cpt_option');
-        $this->add_cpt_field()
-        ?>
-        <a class="button button-primary" href="options-general.php?page=cpt-generator&tab=cpt">Add New</a><hr/>
-        <div class="postbox">
-            <h3 class="hndle">
-                <span><?php _e('Generate Post Type'); ?></span>
-            </h3>
-            <form method="post" action="options.php"  class="clearfix">
-                <div class="inside">
-                    <?php
-                    wp_nonce_field('save_options_action', 'save_options_nonce_field');
+        $this->add_cpt_field();
 
-                    settings_fields('cpt_option_group');
-                    do_settings_sections('cpt-generator');
-                    submit_button();
-                    ?>
-                </div>
-            </form>
-        </div>
-        <?php if ($this->options) { ?>
+        if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
+            ?>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt">All Post</a><hr/>
+            <div class="postbox">
+                <h3 class="hndle">
+                    <span><?php _e('Generate Post Type'); ?></span>
+                </h3>
+                <form method="post" action="options.php"  class="clearfix">
+                    <div class="inside">
+                        <?php
+                        wp_nonce_field('save_options_action', 'save_options_nonce_field');
+                        settings_fields('cpt_option_group');
+                        do_settings_sections('cpt-generator');
+                        submit_button();
+                        ?>
+                    </div>
+                </form>
+            </div>
+        <?php } else {
+            ?>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt&editmode=add">Add New</a><hr/>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
                 <th class="manage-column">Post Name</th>
@@ -126,21 +128,31 @@ class CptSettings {
                 <th class="manage-column">Label</th>
             </thead>
             <tbody>
-                <?php foreach ($this->options as $value) { ?>
-                    <tr>
-                        <td class="post-title page-title column-title">
-                            <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
-                            <div class="row-actions">
-                                <span class="edit"><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
+                <?php
+                if ($this->options) {
+                    foreach ($this->options as $value) {
+                        ?>
+                        <tr>
+                            <td class="post-title page-title column-title">
+                                <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
+                                <div class="row-actions">
+                                    <span class="edit"><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=cpt&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=cpt&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
 
-                            </div>
-                        </td>
-                        <td><?php echo $value['cpt_public'] ? "True" : "False"; ?></td>
-                        <td><?php echo $value['cpt_labels_name']; ?></td>
-                    </tr>
-                <?php } ?>
+                                </div>
+                            </td>
+                            <td><?php echo $value['cpt_public'] ? "True" : "False"; ?></td>
+                            <td><?php echo $value['cpt_labels_name']; ?></td>
+                        </tr>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <tr class="no-items"><td class="colspanchange" colspan="3">No custom posts found created using this plugin.</td></tr>
+                    <?php
+                }
+                ?>
             </tbody>
             </table>
             <?php
@@ -253,23 +265,23 @@ class CptSettings {
     function sanitize_cpt_options($input) {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $cpt_option = get_option('cpt_option'); // Get the current options from the db
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = $_POST["cpt_post_type"];
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = $_POST["cpt_labels_name"];
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = isset($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"];
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = sanitize_text_field($_POST["cpt_post_type"]);
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = sanitize_text_field(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = sanitize_text_field(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"]);
             $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = isset($_POST["cpt_description"]) ? $_POST["cpt_description"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = esc_textarea($_POST["cpt_description"]);
             $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = isset($_POST["cpt_menu_position"]) ? $_POST["cpt_menu_position"] : "";
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = $_POST["cpt_menu_position"];
             $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
             $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = isset($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : null;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : null;
             return $cpt_option;
         }
     }
@@ -295,7 +307,7 @@ class CptSettings {
      */
     function cpt_labels_name_callback() {
         ?>
-        <input type="text" name="cpt_labels_name" required="" value="<?php echo isset($this->editval) ? $this->editval['cpt_labels_name'] : "" ?>"/>
+        <input type="text" name="cpt_labels_name" value="<?php echo isset($this->editval) ? $this->editval['cpt_labels_name'] : "" ?>"/>
         <?php
     }
 
@@ -546,7 +558,7 @@ class CptSettings {
      */
     function cpt_menu_icon_callback() {
         ?>
-        <input id="cpt_menu_icon" type="text" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
+        <input id="cpt_menu_icon" type="url" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
         <input id="choose_cpt_icon" class="button" type="button" value="Choose Image" />
         <br/>
         <img id="cpt_menu_icon_thumbnail" src="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" alt="icon not found"/>

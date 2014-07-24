@@ -11,7 +11,7 @@ class CtSettings {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        // add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
+// add_action('admin_menu', array($this, 'add_ct_plugin_page')); //Add menu inside setting for Generator
         add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
 
         /*
@@ -73,24 +73,27 @@ class CtSettings {
 
         $this->options = get_option('ct_option');
         $this->add_ct_field();
-        ?>
-        <a class="button button-primary" href="options-general.php?page=cpt-generator&tab=ct">Add New</a><hr/>
-        <div class="postbox">
-            <h3 class="hndle">
-                <span><?php _e('Generate Taxonomy'); ?></span>
-            </h3>
-            <form method="post" action="options.php">
-                <div class="inside">
-                    <?php
-                    wp_nonce_field('save_options_action', 'save_options_nonce_field');
-                    settings_fields('ct_option_group');
-                    do_settings_sections('cpt-generator');
-                    submit_button();
-                    ?>
-                </div>
-            </form>
-        </div>
-        <?php if ($this->options) { ?>
+        if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
+            ?>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct">All Taxonomy</a><hr/>
+            <div class="postbox">
+                <h3 class="hndle">
+                    <span><?php _e('Generate Taxonomy'); ?></span>
+                </h3>
+                <form method="post" action="options.php">
+                    <div class="inside">
+                        <?php
+                        wp_nonce_field('save_options_action', 'save_options_nonce_field');
+                        settings_fields('ct_option_group');
+                        do_settings_sections('cpt-generator');
+                        submit_button();
+                        ?>
+                    </div>
+                </form>
+            </div>
+        <?php } else {
+            ?>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct&editmode=add">Add New</a><hr/>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
                 <th class="manage-column">Name</th>
@@ -98,20 +101,30 @@ class CtSettings {
                 <th class="manage-column">Label</th>
             </thead>
             <tbody>
-                <?php foreach ($this->options as $value) { ?>
-                    <tr>
-                        <td class="post-title page-title column-title">
-                            <strong><a><?php echo $value['ct_name']; ?></a></strong>
-                            <div class="row-actions">
-                                <span class="edit"><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
+                <?php
+                if ($this->options) {
+                    foreach ($this->options as $value) {
+                        ?>
+                        <tr>
+                            <td class="post-title page-title column-title">
+                                <strong><a><?php echo $value['ct_name']; ?></a></strong>
+                                <div class="row-actions">
+                                    <span class="edit"><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=ct&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=ct&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
 
-                            </div>
-                        </td>
-                        <td><?php echo $value['ct_singular_name']; ?></td>
-                    </tr>
-                <?php } ?>
+                                </div>
+                            </td>
+                            <td><?php echo $value['ct_singular_name']; ?></td>
+                        </tr>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <tr class="no-items"><td class="colspanchange" colspan="2">No custom taxonomy found created using this plugin.</td></tr>
+                    <?php
+                }
+                ?>
             </tbody>
             </table>
             <?php
@@ -179,18 +192,20 @@ class CtSettings {
      * @param array $input Contains all settings fields as array keys
      */
     public function sanitize_ct_options($input) {
-        $ct_option = get_option('ct_option'); // Get the current options from the db
-        $ct_option[$_POST["ct_name"]]["ct_name"] = $_POST["ct_name"];
-        $ct_option[$_POST["ct_name"]]["ct_singular_name"] = $_POST["ct_singular_name"];
-        $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["ct_show_tagcloud"] = isset($_POST["ct_show_tagcloud"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["ct_query_var"] = isset($_POST["ct_query_var"]) ? true : false;
-        $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
+        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
+            $ct_option = get_option('ct_option'); // Get the current options from the db
+            $ct_option[$_POST["ct_name"]]["ct_name"] = sanitize_text_field($_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_singular_name"] = sanitize_text_field(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["ct_show_tagcloud"] = isset($_POST["ct_show_tagcloud"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["ct_query_var"] = isset($_POST["ct_query_var"]) ? true : false;
+            $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
 
-        return $ct_option;
+            return $ct_option;
+        }
     }
 
     /**
@@ -214,7 +229,7 @@ class CtSettings {
      */
     public function singular_name_callback() {
         ?>
-        <input type="text" name="ct_singular_name" required="" value="<?php echo isset($this->editval) ? $this->editval['ct_singular_name'] : "" ?>"/>
+        <input type="text" name="ct_singular_name" value="<?php echo isset($this->editval) ? $this->editval['ct_singular_name'] : "" ?>"/>
         <?php
     }
 
