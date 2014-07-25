@@ -8,11 +8,7 @@
  * Author URI: https://rtcamp.com/
  * License: A "Slug" license name e.g. GPL2
  */
-
-
-
-if(is_admin()){
+if (is_admin()) {
     require_once(plugin_dir_path(__FILE__) . 'lib/class-admin.php');
-    
-    $admin=new admin();
+    $admin = new Admin();
 }

@@ -2,7 +2,7 @@
 require_once(plugin_dir_path(__FILE__) . 'class-cpt.php');
 require_once(plugin_dir_path(__FILE__) . 'class-ct.php');
 
-class admin {
+class Admin {
 
     private $cpt_settings, $ct_settings, $cpt_helper_tabs;
 
@@ -94,6 +94,7 @@ class admin {
     /*
      * Enqueuing style and script
      */
+
     function cpt_admin_scripts() {
         global $pagenow;
         if ('options-general.php' == $pagenow || 'settings.php' == $pagenow) {
@@ -170,7 +171,7 @@ class admin {
             <h3 class="hndle"><span><?php _e('Latest News', 'cpt-helper'); ?></span></h3>
             <div class="inside"></div>
         </div>
-    <?php
+        <?php
     }
 
 }

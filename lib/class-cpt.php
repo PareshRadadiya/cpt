@@ -5,7 +5,7 @@
  */
 class CptSettings {
 
-    private $options, $dir, $editval;
+    private $options, $dir, $editval, $helper;
 
     function __construct() {
         $this->options = get_option('cpt_option');
@@ -13,7 +13,6 @@ class CptSettings {
         $this->editval;
 
         add_action('admin_init', array($this, 'cpt_register_setting')); // Set setting page for CPT Generator
-
         /*
          * delete or edit cpt 
          */
@@ -76,25 +75,6 @@ class CptSettings {
             }
         }
     }
-
-//    function add_cpt_caps() {
-//        // gets the administrator role
-//        $admins = get_role('administrator');
-//        if ($this->options) {
-//            foreach ($this->options as $value) {
-//                $slug = $value['cpt_post_type'];
-//                $admins->add_cap("edit_{$slug}");
-//                $admins->add_cap("edit_{$slug}s");
-//                $admins->add_cap("edit_other_{$slug}s");
-//                $admins->add_cap("publish_{$slug}s");
-//                $admins->add_cap("read_{$slug}");
-//                $admins->add_cap("read_private_{$slug}s");
-//                $admins->add_cap("delete_{$slug}");
-//                $admins->add_cap("delete_published_{$slug}s");
-//                $admins->add_cap("delete_{$slug}s");
-//            }
-//        }
-//    }
 
     /**
      * Add options page
@@ -166,7 +146,7 @@ class CptSettings {
                                     <img src="<?php echo $value['cpt_menu_icon']; ?>" width="16" height="16" />
                                 <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
-                                <?php } ?>
+                    <?php } ?>
                             </td>
                         </tr>
                         <?php
@@ -219,76 +199,86 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_post_type', 'Post Type', array($this, 'post_type_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_post_type', 'Post Type', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type")
         );
 
         add_settings_field(
-                'cpt_labels_name', 'Label Name', array($this, 'cpt_labels_name_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_labels_name', 'Label Name', array($this,'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name")
         );
 
         add_settings_field(
-                'cpt_labels_singular_name', 'Singular Name', array($this, 'cpt_labels_singular_name_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_labels_singular_name', 'Singular Name', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_singular_name")
         );
 
         add_settings_field(
                 'cpt_description', 'Description', array($this, 'cpt_description_callback'), 'cpt-generator', 'cpt_setting_section'
         );
 
-
         add_settings_field(
-                'cpt_public', 'Public', array($this, 'cpt_public_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_public', 'Public', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_public")
         );
 
         add_settings_field(
-                'cpt_exclude_from_search', 'Exclude From Search', array($this, 'cpt_exclude_from_search_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_exclude_from_search', 'Exclude From Search', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_exclude_from_search")
         );
 
         add_settings_field(
-                'cpt_publicly_queryable', 'Publically Queryable', array($this, 'cpt_publicly_queryable_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_publicly_queryable', 'Publically Queryable', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_publicly_queryable")
         );
 
         add_settings_field(
-                'cpt_show_ui', 'Show UI', array($this, 'cpt_show_ui_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_show_ui', 'Show UI', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_ui")
         );
 
         add_settings_field(
-                'cpt_show_in_nav_menus', 'Show In Nav Menu', array($this, 'cpt_show_in_nav_menus_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_show_in_nav_menus', 'Show In Nav Menu', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_nav_menus")
         );
 
         add_settings_field(
-                'cpt_show_in_menu', 'Show In Menu', array($this, 'cpt_show_in_menu_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_show_in_menu', 'Show In Menu', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_menu")
         );
 
         add_settings_field(
-                'cpt_show_in_admin_bar', 'Show In Admin Bar', array($this, 'cpt_show_in_admin_bar_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_show_in_admin_bar', 'Show In Admin Bar', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_admin_bar")
         );
 
         add_settings_field(
                 'cpt_menu_position', 'Menu Position', array($this, 'cpt_menu_position_callback'), 'cpt-generator', 'cpt_setting_section'
         );
 
-//        add_settings_field(
-//                'cpt_capability_type', 'Capability Type', array($this, 'cpt_capability_type_callback'), 'cpt-generator', 'cpt_setting_section'
-//        );
-//
-//            add_settings_field(
-//                    'cpt_capabilities', 'Capability Type', array($this, 'cpt_capabilities_callback'), 'cpt-generator', 'cpt_setting_section'
-//            );
         add_settings_field(
-                'cpt_hierarchical', 'Hierarchical', array($this, 'cpt_hierarchical_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_hierarchical', 'Hierarchical', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_hierarchical")
+        );
+
+        $taxonomies = array(
+            array("field_value" => "category", "field_label" => "Category", "field_checked" => ""),
+            array("field_value" => "post_tag", "field_label" => "Tag", "field_checked" => ""),
         );
 
         add_settings_field(
-                'cpt_taxonomies', 'Built in Taxonomies', array($this, 'cpt_taxonomies_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_taxonomies', 'Built in Taxonomies', array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_taxonomies", "field_values" => $taxonomies)
         );
 
         add_settings_field(
-                'cpt_has_archive', 'Has Archive', array($this, 'cpt_has_archive_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_has_archive', 'Has Archive', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_has_archive")
         );
 
+        $supports = array(
+            array("field_value" => "title", "field_label" => "Title", "field_checked" => "checked"),
+            array("field_value" => "editor", "field_label" => "Editor", "field_checked" => "checked"),
+            array("field_value" => "author", "field_label" => "Author", "field_checked" => "checked"),
+            array("field_value" => "thumbnail", "field_label" => "Thumbnail", "field_checked" => ""),
+            array("field_value" => "excerpt", "field_label" => "Excerpt", "field_checked" => ""),
+            array("field_value" => "trackbacks", "field_label" => "Trackbacks", "field_checked" => ""),
+            array("field_value" => "custom-fields", "field_label" => "Custom Fields", "field_checked" => ""),
+            array("field_value" => "comments", "field_label" => "Comments", "field_checked" => ""),
+            array("field_value" => "revisions", "field_label" => "Revisions", "field_checked" => ""),
+            array("field_value" => "page-attributes", "field_label" => "Page Attributes", "field_checked" => ""),
+            array("field_value" => "post-formats", "field_label" => "Post Formats", "field_checked" => ""),
+        );
 
         add_settings_field(
-                'cpt_supports', 'Supports Type', array($this, 'support_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_supports', 'Supports Type', array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_supports", "field_values" => $supports)
         );
 
 
@@ -297,7 +287,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_query_var', 'Query Var', array($this, 'cpt_query_var_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_query_var', 'Query Var', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_query_var")
         );
     }
 
@@ -339,161 +329,6 @@ class CptSettings {
     }
 
     /**
-     * Post type name option callback
-     */
-    function post_type_callback() {
-        ?>
-        <input type="text" name="cpt_post_type" required="" value="<?php echo isset($this->editval) ? $this->editval['cpt_post_type'] : "" ?>" />
-        <?php
-    }
-
-    /**
-     * Post label name option callback
-     */
-    function cpt_labels_name_callback() {
-        ?>
-        <input type="text" name="cpt_labels_name" value="<?php echo isset($this->editval) ? $this->editval['cpt_labels_name'] : "" ?>"/>
-        <?php
-    }
-
-    /**
-     * Post label sigular name option callback
-     */
-    function cpt_labels_singular_name_callback() {
-        ?>
-        <input type="text" name="cpt_labels_singular_name"  value="<?php echo isset($this->editval) ? $this->editval['cpt_labels_singular_name'] : "" ?>"/>
-        <?php
-    }
-
-    /**
-     * Post label sigular name option callback
-     */
-    function cpt_description_callback() {
-        ?>
-        <textarea name="cpt_description"><?php echo isset($this->editval) ? $this->editval['cpt_description'] : "" ?></textarea>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_public_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_public" id="cpt_public" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_public'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_public">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_exclude_from_search_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_exclude_from_search" id="cpt_exclude_from_search" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_exclude_from_search'], true) : ""; ?> >
-            <label class="onoffswitch-label" for="cpt_exclude_from_search">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_publicly_queryable_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_publicly_queryable" id="cpt_publicly_queryable" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_publicly_queryable'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_publicly_queryable">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_show_ui_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_show_ui" id="cpt_show_ui" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_ui'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_show_ui">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_show_in_nav_menus_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_show_in_nav_menus" id="cpt_show_in_nav_menus" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_nav_menus'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_show_in_nav_menus">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_show_in_menu_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_show_in_menu" id="cpt_show_in_menu" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_menu'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_show_in_menu">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_show_in_admin_bar_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_show_in_admin_bar" id="cpt_show_in_admin_bar" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_show_in_admin_bar'], true) : "checked"; ?> >
-            <label class="onoffswitch-label" for="cpt_show_in_admin_bar">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
      * Public visibility option callback
      */
     function cpt_menu_position_callback() {
@@ -502,98 +337,9 @@ class CptSettings {
         <?php
     }
 
-    /**
-     * Public visibility option callback
-     */
-    function cpt_capability_type_callback() {
+    function cpt_description_callback() {
         ?>
-        <input type="checkbox"  name="cpt_capability_type[]"  value="post"  <?php isset($this->editval) ? checked(in_array("post", $this->editval["cpt_capability_type"]), true) : ""; ?>/> Post<br/>
-        <input type="checkbox"  name="cpt_capability_type[]"  value="page"  <?php isset($this->editval) ? checked(in_array("page", $this->editval["cpt_capability_type"]), true) : ""; ?>/> Page<br/>
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_capabilities_callback() {
-        ?>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="edit_post"  <?php isset($this->editval) ? checked(in_array("edit_post", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Edit Post<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="read_post"  <?php isset($this->editval) ? checked(in_array("read_post", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Read Post<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="delete_post"  <?php isset($this->editval) ? checked(in_array("delete_post", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Delete Post<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="edit_posts"  <?php isset($this->editval) ? checked(in_array("edit_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Edit Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="edit_others_posts"  <?php isset($this->editval) ? checked(in_array("edit_others_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Edit Others Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="publish_posts"  <?php isset($this->editval) ? checked(in_array("publish_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Publish Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="read_private_posts"  <?php isset($this->editval) ? checked(in_array("read_private_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Read Private Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="delete_posts"  <?php isset($this->editval) ? checked(in_array("delete_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Delete Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="delete_private_posts"  <?php isset($this->editval) ? checked(in_array("delete_private_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Delete Private Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="delete_published_posts"  <?php isset($this->editval) ? checked(in_array("delete_published_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Delete Published Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="delete_others_posts"  <?php isset($this->editval) ? checked(in_array("delete_others_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Delete Others Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="edit_private_posts"  <?php isset($this->editval) ? checked(in_array("edit_private_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Edit Private Posts<br/>
-        <input type="checkbox"  name="cpt_capabilities[]"  value="edit_published_posts"  <?php isset($this->editval) ? checked(in_array("edit_published_posts", $this->editval["cpt_capabilities"]), true) : ""; ?>/> Edit Published Posts<br/>
-        <?php
-    }
-
-    /**
-     * Achive option callback
-     */
-    function cpt_hierarchical_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_hierarchical" id="cpt_hierarchical" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['cpt_hierarchical'], true) : ""; ?>>
-            <label class="onoffswitch-label" for="cpt_hierarchical">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-
-        <?php
-    }
-
-    /**
-     * Public visibility option callback
-     */
-    function cpt_taxonomies_callback() {
-        ?>
-        <input type="checkbox"  name="cpt_taxonomies[]"  value="category"  <?php isset($this->editval) ? checked(in_array("category", $this->editval["cpt_taxonomies"]), true) : ""; ?>/> Category<br/>
-        <input type="checkbox"  name="cpt_taxonomies[]"  value="post_tag"  <?php isset($this->editval) ? checked(in_array("post_tag", $this->editval["cpt_taxonomies"]), true) : ""; ?>/> Tag<br/>
-        <?php
-    }
-
-    /**
-     * Achive option callback
-     */
-    function cpt_has_archive_callback() {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="cpt_has_archive" id="cpt_has_archive" class="onoffswitch-checkbox" value="true" <?php isset($this->editval) ? checked($this->editval['cpt_has_archive'], true) : ""; ?>>
-            <label class="onoffswitch-label" for="cpt_has_archive">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    /**
-     * Supports option callbacks
-     */
-    function support_callback() {
-        ?>
-        <input type="checkbox"  name="cpt_supports[]"  value="title"  <?php echo isset($this->editval) ? checked(in_array("title", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Title<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="editor"  <?php echo isset($this->editval) ? checked(in_array("editor", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Editor<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="author"  <?php echo isset($this->editval) ? checked(in_array("author", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Author<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="thumbnail"  <?php isset($this->editval) ? checked(in_array("thumbnail", $this->editval["cpt_supports"]), true) : ""; ?>/> Thumbnail <br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="excerpt"  <?php isset($this->editval) ? checked(in_array("excerpt", $this->editval["cpt_supports"]), true) : ""; ?>/> Excerpt<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="trackbacks"  <?php isset($this->editval) ? checked(in_array("trackbacks", $this->editval["cpt_supports"]), true) : ""; ?>/> Trackbacks<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="custom-fields"  <?php isset($this->editval) ? checked(in_array("custom-fields", $this->editval["cpt_supports"]), true) : ""; ?>/> Custom Field<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="comments"  <?php isset($this->editval) ? checked(in_array("comments", $this->editval["cpt_supports"]), true) : ""; ?>/> Comments<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="revisions"  <?php isset($this->editval) ? checked(in_array("revisions", $this->editval["cpt_supports"]), true) : ""; ?>/> Revisions<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="page-attributes"  <?php isset($this->editval) ? checked(in_array("page-attributes", $this->editval["cpt_supports"]), true) : ""; ?>/> Page Attributes<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="post-formats"  <?php isset($this->editval) ? checked(in_array("post-formats", $this->editval["cpt_supports"]), true) : ""; ?>/> Post Formats<br/>
+        <textarea name="cpt_description"><?php echo isset($this->editval) ? $this->editval['cpt_description'] : "" ?></textarea>
         <?php
     }
 
@@ -609,36 +355,31 @@ class CptSettings {
         <?php
     }
 
-    /**
-     * Achive option callback
-     */
-    function cpt_query_var_callback() {
+    function display_switch_option($args) {
         ?>
         <div class="onoffswitch">
-            <input type="checkbox" name="cpt_query_var" id="cpt_query_var" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_query_var'], true) : "checked"; ?>>
-            <label class="onoffswitch-label" for="cpt_query_var">
+            <input type="checkbox" name="<?php _e($args["field_name"]) ?>" id="<?php _e($args["field_name"]) ?>" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval[$args["field_name"]], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="<?php _e($args["field_name"]) ?>">
                 <span class="onoffswitch-inner">
                     <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
                     <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
                 </span>
             </label>
         </div>
-
         <?php
     }
 
-    function searchItemsByKey($array, $key) {
-        $results = array();
+    function display_textbox_option($args) {
+        ?>
+        <input type="text" name="<?php _e($args["field_name"]) ?>" value="<?php echo isset($this->editval) ? $this->editval[$args["field_name"]] : "" ?>"/>
+        <?php
+    }
 
-        if (is_array($array)) {
-            if (isset($array[$key]) && key($array) == $key)
-                $results[] = $arrayх[$key];
-
-            foreach ($array as $sub_array)
-                $results = array_merge($results, searchItemsByKey($sub_array, $key));
+    function display_checkbox_option($args) {
+        foreach ($args["field_values"] as $value) {
+            ?><input type="checkbox"  name="<?php _e($args["field_name"]) ?>[]"  value="<?php _e($value["field_value"]) ?>"  <?php echo isset($this->editval) ? checked(in_array($value["field_value"], $this->editval[$args["field_name"]]), true) : $value["field_checked"]; ?>/> <?php _e($value["field_label"]) ?><br/>
+            <?php
         }
-
-        return $results;
     }
 
 }
