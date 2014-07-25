@@ -40,21 +40,21 @@ class CtSettings {
             foreach ($this->options as $value) {
 
                 $labels = array(
-                    'name' => _x($value['ct_label_name'], 'taxonomy general name', 'cpt'),
+                    'name' => _x($value['ct_label_name'], 'taxonomy general name', 'cpt-generator'),
                     'singular_name' => _x($value['ct_singular_name'], 'taxonomy singular name'),
-                    'search_items' => __('Search ' . $value['ct_label_name'], 'cpt'),
-                    'popular_items' => __('Popular ' . $value['ct_label_name'], 'cpt'),
-                    'all_items' => __('All ' . $value['ct_label_name'], 'cpt'),
-                    'parent_item' => __('Parent ' . $value['ct_singular_name'], 'cpt'),
-                    'parent_item_colon' => __('Parent ' . $value['ct_singular_name'], 'cpt' . ':'),
-                    'edit_item' => __('Edit ' . $value['ct_singular_name'], 'cpt'),
-                    'update_item' => __('Update ' . $value['ct_singular_name'], 'cpt'),
-                    'add_new_item' => __('Add New ' . $value['ct_singular_name'], 'cpt'),
-                    'new_item_name' => __('New ' . $value['ct_singular_name'], 'cpt' . ' Name'),
-                    'separate_items_with_commas' => __('Seperate ' . $value['ct_label_name'], 'cpt' . ' with commas'),
-                    'add_or_remove_items' => __('Add or remove ' . $value['ct_label_name'], 'cpt'),
-                    'choose_from_most_used' => __('Choose from the most used ' . $value['ct_label_name'], 'cpt'),
-                    'menu_name' => __('All ' . $value['ct_label_name'], 'cpt')
+                    'search_items' => __('Search ' . $value['ct_label_name'], 'cpt-generator'),
+                    'popular_items' => __('Popular ' . $value['ct_label_name'], 'cpt-generator'),
+                    'all_items' => __('All ' . $value['ct_label_name'], 'cpt-generator'),
+                    'parent_item' => __('Parent ' . $value['ct_singular_name'], 'cpt-generator'),
+                    'parent_item_colon' => __('Parent ' . $value['ct_singular_name'], 'cpt-generator' . ':'),
+                    'edit_item' => __('Edit ' . $value['ct_singular_name'], 'cpt-generator'),
+                    'update_item' => __('Update ' . $value['ct_singular_name'], 'cpt-generator'),
+                    'add_new_item' => __('Add New ' . $value['ct_singular_name'], 'cpt-generator'),
+                    'new_item_name' => __('New ' . $value['ct_singular_name'], 'cpt-generator' . ' Name'),
+                    'separate_items_with_commas' => __('Seperate ' . $value['ct_label_name'], 'cpt-generator' . ' with commas'),
+                    'add_or_remove_items' => __('Add or remove ' . $value['ct_label_name'], 'cpt-generator'),
+                    'choose_from_most_used' => __('Choose from the most used ' . $value['ct_label_name'], 'cpt-generator'),
+                    'menu_name' => __('All ' . $value['ct_label_name'], 'cpt-generator')
                 );
 
                 $args = array(
@@ -73,14 +73,7 @@ class CtSettings {
             }
         }
     }
-
-    /**
-     * Add options page
-     */
-    public function add_ct_plugin_page() {
-        add_options_page('CT Generator', 'CT Generator', 'manage_options', 'cpt-generator', array($this, 'create_ct_page'));
-    }
-
+    
     /**
      *  section for view all post and add new
      */
@@ -90,10 +83,10 @@ class CtSettings {
         $this->add_ct_field();
         if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
             ?>
-            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct">All Taxonomy</a><hr/>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct"><?php _e('All Taxonomy','cpt-generator') ?></a><hr/>
             <div class="postbox">
                 <h3 class="hndle">
-                    <span><?php _e('Generate Taxonomy'); ?></span>
+                    <span><?php _e('Generate Taxonomy','cpt-generator'); ?></span>
                 </h3>
                 <form method="post" action="options.php">
                     <div class="inside">
@@ -108,14 +101,12 @@ class CtSettings {
             </div>
         <?php } else {
             ?>
-            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct&editmode=add">Add New</a><hr/>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct&editmode=add"><?php _e('Add New', 'cpt-generator') ?></a><hr/>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
-                <th class="manage-column">Name</th>
-
-                <th class="manage-column">Label</th>
-                <th class="manage-column">Show UI</th>
-
+                <th class="manage-column"><?php _e('Name', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Label', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Show UI', 'cpt-generator') ?></th>
             </thead>
             <tbody>
                 <?php
@@ -148,13 +139,13 @@ class CtSettings {
                 ?>
             </tbody>
             <tfoot>
-            <th class="manage-column">Name</th>
-            <th class="manage-column">Label</th>
-            <th class="manage-column">Show UI</th>
+            <th class="manage-column"><?php _e('Name', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Label', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Show UI', 'cpt-generator') ?></th>
             </tfoot>
             </table>
             <div class="tablenav bottom">		
-                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf( _n( '%d item', '%d items', $index - 1, 'cpt-generator' ), $index - 1 ); ?></span>		
+                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf(_n('%d item', '%d items', $index - 1, 'cpt-generator'), $index - 1); ?></span>		
                     <br class="clear">
                 </div>
             </div>
@@ -179,54 +170,54 @@ class CtSettings {
     public function add_ct_field() {
         add_settings_section(
                 'ct_setting_section', // ID
-                'General Settings', // Title
+                __('General Settings', 'cpt-generator'), // Title
                 array($this, 'general_section_info'), // Callback
                 'cpt-generator' // Page
         );
 
         add_settings_field(
-                'ct_name', 'Taxonomy Name', array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name")
+                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name")
         );
 
         add_settings_field(
-                'ct_label_name', 'Label Name', array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name")
+                'ct_label_name', __('Label Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name")
         );
 
         add_settings_field(
-                'ct_singular_name', 'Singular Name', array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name")
+                'ct_singular_name', __('Singular Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name")
         );
 
         add_settings_field(
-                'ct_hierarchical', 'Hierarchical', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical")
+                'ct_hierarchical', __('Hierarchical', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical")
         );
 
         add_settings_field(
-                'ct_show_ui', 'Show UI', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui")
+                'ct_show_ui', __('Show UI', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui")
         );
 
         add_settings_field(
-                'ct_show_in_nav_menus', 'Show In Nav Menu', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus")
+                'ct_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus")
         );
 
         add_settings_field(
-                'ct_show_tagcloud', 'Show Tag Cloud', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud")
+                'ct_show_tagcloud', __('Show Tag Cloud', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud")
         );
         add_settings_field(
-                'ct_show_admin_column', 'Show Admin Column', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column")
+                'ct_show_admin_column', __('Show Admin Column', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column")
         );
 
         add_settings_field(
-                'ct_query_var', 'Query Var', array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var")
+                'ct_query_var', __('Query Var', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var")
         );
 
 
         $post_type_support = array();
         $post_types = get_post_types();
         foreach ($post_types as $post_type) {
-             array_push($post_type_support,array("field_value" => "$post_type", "field_label" => "$post_type", "field_checked" => ""));
+            array_push($post_type_support, array("field_value" => "$post_type", "field_label" => "$post_type", "field_checked" => ""));
         }
         add_settings_field(
-                'post_types', 'Post Type', array($this, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section',array("field_name" => "post_types", "field_values" => $post_type_support)
+                'post_types', __('Post Type', 'cpt-generator'), array($this, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "post_types", "field_values" => $post_type_support)
         );
     }
 
@@ -257,7 +248,7 @@ class CtSettings {
      * Print the General Section info
      */
     public function general_section_info() {
-        print 'Enter your general ct settings below:';
+       _e('Enter your general ct settings below');
     }
 
     function display_switch_option($args) {

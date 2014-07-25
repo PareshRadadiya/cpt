@@ -38,16 +38,16 @@ class CptSettings {
             foreach ($this->options as $value) {
 
                 $labels = array(
-                    'name' => __($value['cpt_labels_name'], 'cpt'),
-                    'singular_name' => __($value['cpt_labels_singular_name'], 'cpt'),
+                    'name' => __($value['cpt_labels_name'], 'cpt-generator'),
+                    'singular_name' => __($value['cpt_labels_singular_name'], 'cpt-generator'),
                     'add_new' => __('Add New', 'cpt'),
-                    'add_new_item' => __('Add New ' . $value['cpt_labels_singular_name'], 'cpt'),
-                    'edit_item' => __('Edit ' . $value['cpt_labels_singular_name'], 'cpt'),
-                    'new_item' => __('New ' . $value['cpt_labels_singular_name'], 'cpt'),
-                    'view_item' => __('View ' . $value['cpt_labels_singular_name'], 'cpt'),
-                    'search_items' => __('Search ' . $value['cpt_labels_name'], 'cpt'),
-                    'not_found' => __('No ' . $value['cpt_labels_name'] . ' found', 'cpt'),
-                    'not_found_in_trash' => __('No ' . $value['cpt_labels_name'] . ' found in Trash', 'cpt'),
+                    'add_new_item' => __('Add New ' . $value['cpt_labels_singular_name'], 'cpt-generator'),
+                    'edit_item' => __('Edit ' . $value['cpt_labels_singular_name'], 'cpt-generator'),
+                    'new_item' => __('New ' . $value['cpt_labels_singular_name'], 'cpt-generator'),
+                    'view_item' => __('View ' . $value['cpt_labels_singular_name'], 'cpt-generator'),
+                    'search_items' => __('Search ' . $value['cpt_labels_name'], 'cpt-generator'),
+                    'not_found' => __('No ' . $value['cpt_labels_name'] . ' found', 'cpt-generator'),
+                    'not_found_in_trash' => __('No ' . $value['cpt_labels_name'] . ' found in Trash', 'cpt-generator'),
                 );
                 $attachment_url = null;
                 if (!empty($value['cpt_menu_icon'])) {
@@ -81,13 +81,6 @@ class CptSettings {
     }
 
     /**
-     * Add options page
-     */
-    function add_cpt_plugin_page() {
-        add_options_page('CPT Generator', 'CPT Generator', 'manage_options', 'cpt-generator', array($this, 'create_cpt_page'));
-    }
-
-    /**
      * section for view all post and add new
      */
     function add_cpt_section() {
@@ -97,10 +90,10 @@ class CptSettings {
 
         if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
             ?>
-            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt">All Post</a><hr/>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt"><?php _e('All Post','cpt-generator') ?></a><hr/>
             <div class="postbox">
                 <h3 class="hndle">
-                    <span><?php _e('Generate Post Type'); ?></span>
+                    <span><?php _e('Generate Post Type','cpt-generator'); ?></span>
                 </h3>
                 <form method="post" action="options.php"  class="clearfix">
                     <div class="inside">
@@ -115,14 +108,14 @@ class CptSettings {
             </div>
         <?php } else {
             ?>
-            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt&editmode=add">Add New</a><hr/>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt&editmode=add"><?php _e('Add New', 'cpt-generator') ?></a><hr/>
             <table class="wp-list-table widefat fixed pages">
                 <thead>
-                <th class="manage-column">Post Name</th>
-                <th class="manage-column">Public</th>
-                <th class="manage-column">Label</th>
-                <th class="manage-column">Description</th>
-                <th class="manage-column">Icon</th>
+                <th class="manage-column"><?php _e('Post Name', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Public', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Label', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Description', 'cpt-generator') ?></th>
+                <th class="manage-column"><?php _e('Icon', 'cpt-generator') ?></th>
             </thead>
             <tbody>
                 <?php
@@ -147,7 +140,7 @@ class CptSettings {
                             <td><?php echo $value['cpt_description']; ?></td>
                             <td>
                                 <?php if (!empty($value['cpt_menu_icon'])) { ?>
-                                    <img src="<?php echo wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0] ; ?>" />
+                                    <img src="<?php echo wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0]; ?>" />
                                 <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
                                 <?php } ?>
@@ -164,11 +157,11 @@ class CptSettings {
                 ?>
             </tbody>
             <tfoot>
-            <th class="manage-column">Post Name</th>
-            <th class="manage-column">Public</th>
-            <th class="manage-column">Label</th>
-            <th class="manage-column">Description</th>
-            <th class="manage-column">Icon</th>
+            <th class="manage-column"><?php _e('Post Name', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Public', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Label', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Description', 'cpt-generator') ?></th>
+            <th class="manage-column"><?php _e('Icon', 'cpt-generator') ?></th>
             </tfoot>
             </table>
             <div class="tablenav bottom">		
@@ -197,61 +190,61 @@ class CptSettings {
     public function add_cpt_field() {
         add_settings_section(
                 'cpt_setting_section', // ID
-                'General Settings', // Title
+                 __('General Settings', 'cpt-generator'), // Title
                 array($this, 'general_section_info'), // Callback
                 'cpt-generator' // Page
         );
 
         add_settings_field(
-                'cpt_post_type', 'Post Type', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type")
+                'cpt_post_type', __('Post Type', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type")
         );
 
         add_settings_field(
-                'cpt_labels_name', 'Label Name', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name")
+                'cpt_labels_name', __('Label Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name")
         );
 
         add_settings_field(
-                'cpt_labels_singular_name', 'Singular Name', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_singular_name")
+                'cpt_labels_singular_name', __('Singular Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_singular_name")
         );
 
         add_settings_field(
-                'cpt_description', 'Description', array($this, 'cpt_description_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_description', __('Description', 'cpt-generator'), array($this, 'cpt_description_callback'), 'cpt-generator', 'cpt_setting_section'
         );
 
         add_settings_field(
-                'cpt_public', 'Public', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_public")
+                'cpt_public', __('Public', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_public")
         );
 
         add_settings_field(
-                'cpt_exclude_from_search', 'Exclude From Search', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_exclude_from_search")
+                'cpt_exclude_from_search', __('Exclude From Search', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_exclude_from_search")
         );
 
         add_settings_field(
-                'cpt_publicly_queryable', 'Publically Queryable', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_publicly_queryable")
+                'cpt_publicly_queryable', __('Publically Queryable', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_publicly_queryable")
         );
 
         add_settings_field(
-                'cpt_show_ui', 'Show UI', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_ui")
+                'cpt_show_ui', __('Show UI', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_ui")
         );
 
         add_settings_field(
-                'cpt_show_in_nav_menus', 'Show In Nav Menu', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_nav_menus")
+                'cpt_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_nav_menus")
         );
 
         add_settings_field(
-                'cpt_show_in_menu', 'Show In Menu', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_menu")
+                'cpt_show_in_menu', __('Show In Menu', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_menu")
         );
 
         add_settings_field(
-                'cpt_show_in_admin_bar', 'Show In Admin Bar', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_admin_bar")
+                'cpt_show_in_admin_bar', __('Show In Admin Bar', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_admin_bar")
         );
 
         add_settings_field(
-                'cpt_menu_position', 'Menu Position', array($this, 'cpt_menu_position_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_menu_position', __('Menu Position', 'cpt-generator'), array($this, 'cpt_menu_position_callback'), 'cpt-generator', 'cpt_setting_section'
         );
 
         add_settings_field(
-                'cpt_hierarchical', 'Hierarchical', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_hierarchical")
+                'cpt_hierarchical', __('Hierarchical', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_hierarchical")
         );
 
         $taxonomies = array(
@@ -260,11 +253,11 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_taxonomies', 'Built in Taxonomies', array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_taxonomies", "field_values" => $taxonomies)
+                'cpt_taxonomies', __('Built in Taxonomies', 'cpt-generator'), array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_taxonomies", "field_values" => $taxonomies)
         );
 
         add_settings_field(
-                'cpt_has_archive', 'Has Archive', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_has_archive")
+                'cpt_has_archive', __('Has Archive', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_has_archive")
         );
 
         $supports = array(
@@ -282,16 +275,16 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_supports', 'Supports Type', array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_supports", "field_values" => $supports)
+                'cpt_supports', __('Supports Type', 'cpt-generator'), array($this, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_supports", "field_values" => $supports)
         );
 
 
         add_settings_field(
-                'cpt_menu_icon', 'Menu Icon', array($this, 'cpt_menu_icon_callback'), 'cpt-generator', 'cpt_setting_section'
+                'cpt_menu_icon', __('Menu Icon', 'cpt-generator'), array($this, 'cpt_menu_icon_callback'), 'cpt-generator', 'cpt_setting_section'
         );
 
         add_settings_field(
-                'cpt_query_var', 'Query Var', array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_query_var")
+                'cpt_query_var', __('Query Var', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_query_var")
         );
     }
 
@@ -329,7 +322,7 @@ class CptSettings {
      * Print the General Section info
      */
     function general_section_info() {
-        print 'Enter your general cpt settings below:';
+        _e('Enter your general cpt settings below','cpt-generator');
     }
 
     /**
@@ -355,7 +348,7 @@ class CptSettings {
         <input id="cpt_menu_icon" type="hidden" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
         <input id="choose_cpt_icon" class="button" type="button" value="Choose Image" />
         <br/>
-        <img id="cpt_menu_icon_thumbnail" width="16" height="16" src="<?php echo isset($this->editval) ? wp_get_attachment_image_src($this->editval['cpt_menu_icon'], "cpt_menu_icon")[0]: "" ?>" alt="icon not found"/>
+        <img id="cpt_menu_icon_thumbnail" width="16" height="16" src="<?php echo isset($this->editval) ? wp_get_attachment_image_src($this->editval['cpt_menu_icon'], "cpt_menu_icon")[0] : "" ?>" alt="icon not found"/>
         <?php
     }
 
