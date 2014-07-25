@@ -11,7 +11,7 @@ class CtSettings {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        
+
         add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
 
         /*
@@ -37,9 +37,23 @@ class CtSettings {
 
         if ($this->options) {
             foreach ($this->options as $value) {
+
                 $labels = array(
-                    'name' => _x($value['ct_label_name'], 'taxonomy general name'),
-                    'singular_name' => _x($value['ct_singular_name'], 'taxonomy singular name')
+                    'name' => _x($value['ct_label_name'], 'taxonomy general name', 'cpt'),
+                    'singular_name' => _x($value['ct_singular_name'], 'taxonomy singular name'),
+                    'search_items' => __('Search ' . $value['ct_label_name'], 'cpt'),
+                    'popular_items' => __('Popular ' . $value['ct_label_name'], 'cpt'),
+                    'all_items' => __('All ' . $value['ct_label_name'], 'cpt'),
+                    'parent_item' => __('Parent ' . $value['ct_singular_name'], 'cpt'),
+                    'parent_item_colon' => __('Parent ' . $value['ct_singular_name'], 'cpt' . ':'),
+                    'edit_item' => __('Edit ' . $value['ct_singular_name'], 'cpt'),
+                    'update_item' => __('Update ' . $value['ct_singular_name'], 'cpt'),
+                    'add_new_item' => __('Add New ' . $value['ct_singular_name'], 'cpt'),
+                    'new_item_name' => __('New ' . $value['ct_singular_name'], 'cpt' . ' Name'),
+                    'separate_items_with_commas' => __('Seperate ' . $value['ct_label_name'], 'cpt' . ' with commas'),
+                    'add_or_remove_items' => __('Add or remove ' . $value['ct_label_name'], 'cpt'),
+                    'choose_from_most_used' => __('Choose from the most used ' . $value['ct_label_name'], 'cpt'),
+                    'menu_name' => __('All ' . $value['ct_label_name'], 'cpt')
                 );
 
                 $args = array(
@@ -104,13 +118,14 @@ class CtSettings {
             </thead>
             <tbody>
                 <?php
+                 $index = 1;
                 if ($this->options) {
-                    $index = 1;
+                   
                     foreach ($this->options as $value) {
                         ?>
                         <tr class="<?php echo ($index % 2) ? "alternate" : "" ?>">
                             <td class="post-title page-title column-title">
-                                <strong><a><?php echo $value['ct_name']; ?></a></strong>
+                                <strong><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>"><?php echo $value['ct_name']; ?></a></strong>
                                 <div class="row-actions">
                                     <span class="edit"><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
 
@@ -137,6 +152,11 @@ class CtSettings {
             <th class="manage-column">Show UI</th>
             </tfoot>
             </table>
+            <div class="tablenav bottom">		
+                <div class="tablenav-pages one-page"><span class="displaying-num"><?php echo $index - 1; ?> items</span>		
+                    <br class="clear">
+                </div>
+            </div>
             <?php
         }
     }

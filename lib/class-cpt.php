@@ -31,37 +31,28 @@ class CptSettings {
         // add_action('admin_init', array($this, 'add_cpt_caps'));
     }
 
-    function add_cpt_caps() {
-        // gets the administrator role
-        $admins = get_role('administrator');
-        if ($this->options) {
-            foreach ($this->options as $value) {
-                $slug = $value['cpt_post_type'];
-                $admins->add_cap("edit_{$slug}");
-                $admins->add_cap("edit_{$slug}s");
-                $admins->add_cap("edit_other_{$slug}s");
-                $admins->add_cap("publish_{$slug}s");
-                $admins->add_cap("read_{$slug}");
-                $admins->add_cap("read_private_{$slug}s");
-                $admins->add_cap("delete_{$slug}");
-                $admins->add_cap("delete_published_{$slug}s");
-                $admins->add_cap("delete_{$slug}s");
-            }
-        }
-    }
-
     /**
      * Register all custom post type from available options
      */
     function register_cpt() {
         if ($this->options) {
             foreach ($this->options as $value) {
-                $slug = $value['cpt_post_type'];
+
+                $labels = array(
+                    'name' => __($value['cpt_labels_name'], 'cpt'),
+                    'singular_name' => __($value['cpt_labels_singular_name'], 'cpt'),
+                    'add_new' => __('Add New', 'cpt'),
+                    'add_new_item' => __('Add New ' . $value['cpt_labels_singular_name'], 'cpt'),
+                    'edit_item' => __('Edit ' . $value['cpt_labels_singular_name'], 'cpt'),
+                    'new_item' => __('New ' . $value['cpt_labels_singular_name'], 'cpt'),
+                    'view_item' => __('View ' . $value['cpt_labels_singular_name'], 'cpt'),
+                    'search_items' => __('Search ' . $value['cpt_labels_name'], 'cpt'),
+                    'not_found' => __('No ' . $value['cpt_labels_name'] . ' found', 'cpt'),
+                    'not_found_in_trash' => __('No ' . $value['cpt_labels_name'] . ' found in Trash', 'cpt'),
+                );
+
                 register_post_type($value['cpt_post_type'], array(
-                    'labels' => array(
-                        'name' => $value['cpt_labels_name'],
-                        'singular_name' => $value['cpt_labels_singular_name']
-                    ),
+                    'labels' => $labels,
                     'public' => $value['cpt_public'],
                     'description' => $value['cpt_description'],
                     'exclude_from_search' => $value['cpt_exclude_from_search'],
@@ -77,13 +68,33 @@ class CptSettings {
                     'has_archive' => $value['cpt_has_archive'],
                     'rewrite' => array('slug' => $value['cpt_post_type']),
                     'supports' => $value['cpt_supports'],
-                    'menu_icon' => $value['cpt_menu_icon']
+                    'menu_icon' => $value['cpt_menu_icon'],
+                    'query_var' => $value['cpt_query_var']
                         )
                 );
                 flush_rewrite_rules();
             }
         }
     }
+
+//    function add_cpt_caps() {
+//        // gets the administrator role
+//        $admins = get_role('administrator');
+//        if ($this->options) {
+//            foreach ($this->options as $value) {
+//                $slug = $value['cpt_post_type'];
+//                $admins->add_cap("edit_{$slug}");
+//                $admins->add_cap("edit_{$slug}s");
+//                $admins->add_cap("edit_other_{$slug}s");
+//                $admins->add_cap("publish_{$slug}s");
+//                $admins->add_cap("read_{$slug}");
+//                $admins->add_cap("read_private_{$slug}s");
+//                $admins->add_cap("delete_{$slug}");
+//                $admins->add_cap("delete_published_{$slug}s");
+//                $admins->add_cap("delete_{$slug}s");
+//            }
+//        }
+//    }
 
     /**
      * Add options page
@@ -131,14 +142,15 @@ class CptSettings {
             </thead>
             <tbody>
                 <?php
+                $index = 1;
                 if ($this->options) {
-                    $index = 1;
+
                     foreach ($this->options as $value) {
                         ?>
                         <tr class="<?php echo ($index % 2) ? "alternate" : "" ?>">
-                           
+
                             <td class="post-title page-title column-title">
-                                <strong><a><?php echo $value['cpt_post_type']; ?></a></strong>
+                                <strong><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>"><?php echo $value['cpt_post_type']; ?></a></strong>
                                 <div class="row-actions">
                                     <span class="edit"><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
 
@@ -149,12 +161,12 @@ class CptSettings {
                             <td><?php echo $value['cpt_public'] ? "True" : "False"; ?></td>
                             <td><?php echo $value['cpt_labels_name']; ?></td>
                             <td><?php echo $value['cpt_description']; ?></td>
-                             <td>
+                            <td>
                                 <?php if (!empty($value['cpt_menu_icon'])) { ?>
                                     <img src="<?php echo $value['cpt_menu_icon']; ?>" width="16" height="16" />
-                                <?php }else{?>
+                                <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
-                               <?php } ?>
+                                <?php } ?>
                             </td>
                         </tr>
                         <?php
@@ -175,6 +187,11 @@ class CptSettings {
             <th class="manage-column">Icon</th>
             </tfoot>
             </table>
+            <div class="tablenav bottom">		
+                <div class="tablenav-pages one-page"><span class="displaying-num"><?php echo $index - 1; ?> items</span>		
+                    <br class="clear">
+                </div>
+            </div>
             <?php
         }
     }
@@ -278,6 +295,10 @@ class CptSettings {
         add_settings_field(
                 'cpt_menu_icon', 'Menu Icon', array($this, 'cpt_menu_icon_callback'), 'cpt-generator', 'cpt_setting_section'
         );
+
+        add_settings_field(
+                'cpt_query_var', 'Query Var', array($this, 'cpt_query_var_callback'), 'cpt-generator', 'cpt_setting_section'
+        );
     }
 
     /**
@@ -305,6 +326,7 @@ class CptSettings {
             $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
             $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : null;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_query_var"] = isset($_POST["cpt_query_var"]) ? true : false;
             return $cpt_option;
         }
     }
@@ -553,7 +575,6 @@ class CptSettings {
                 </span>
             </label>
         </div>
-
         <?php
     }
 
@@ -562,9 +583,9 @@ class CptSettings {
      */
     function support_callback() {
         ?>
-        <input type="checkbox"  name="cpt_supports[]"  value="title"  <?php isset($this->editval) ? checked(in_array("title", $this->editval["cpt_supports"]), true) : ""; ?>/> Title<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="editor"  <?php isset($this->editval) ? checked(in_array("editor", $this->editval["cpt_supports"]), true) : ""; ?>/> Editor<br/>
-        <input type="checkbox"  name="cpt_supports[]"  value="author"  <?php isset($this->editval) ? checked(in_array("author", $this->editval["cpt_supports"]), true) : ""; ?>/> Author<br/>
+        <input type="checkbox"  name="cpt_supports[]"  value="title"  <?php echo isset($this->editval) ? checked(in_array("title", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Title<br/>
+        <input type="checkbox"  name="cpt_supports[]"  value="editor"  <?php echo isset($this->editval) ? checked(in_array("editor", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Editor<br/>
+        <input type="checkbox"  name="cpt_supports[]"  value="author"  <?php echo isset($this->editval) ? checked(in_array("author", $this->editval["cpt_supports"]), true) : "checked"; ?>/> Author<br/>
         <input type="checkbox"  name="cpt_supports[]"  value="thumbnail"  <?php isset($this->editval) ? checked(in_array("thumbnail", $this->editval["cpt_supports"]), true) : ""; ?>/> Thumbnail <br/>
         <input type="checkbox"  name="cpt_supports[]"  value="excerpt"  <?php isset($this->editval) ? checked(in_array("excerpt", $this->editval["cpt_supports"]), true) : ""; ?>/> Excerpt<br/>
         <input type="checkbox"  name="cpt_supports[]"  value="trackbacks"  <?php isset($this->editval) ? checked(in_array("trackbacks", $this->editval["cpt_supports"]), true) : ""; ?>/> Trackbacks<br/>
@@ -586,6 +607,38 @@ class CptSettings {
         <br/>
         <img id="cpt_menu_icon_thumbnail" src="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" alt="icon not found"/>
         <?php
+    }
+
+    /**
+     * Achive option callback
+     */
+    function cpt_query_var_callback() {
+        ?>
+        <div class="onoffswitch">
+            <input type="checkbox" name="cpt_query_var" id="cpt_query_var" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval['cpt_query_var'], true) : "checked"; ?>>
+            <label class="onoffswitch-label" for="cpt_query_var">
+                <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
+                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
+                </span>
+            </label>
+        </div>
+
+        <?php
+    }
+
+    function searchItemsByKey($array, $key) {
+        $results = array();
+
+        if (is_array($array)) {
+            if (isset($array[$key]) && key($array) == $key)
+                $results[] = $arrayх[$key];
+
+            foreach ($array as $sub_array)
+                $results = array_merge($results, searchItemsByKey($sub_array, $key));
+        }
+
+        return $results;
     }
 
 }
