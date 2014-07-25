@@ -154,7 +154,7 @@ class CtSettings {
             </tfoot>
             </table>
             <div class="tablenav bottom">		
-                <div class="tablenav-pages one-page"><span class="displaying-num"><?php echo $index - 1; ?> items</span>		
+                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf( _n( '%d item', '%d items', $index - 1, 'cpt-generator' ), $index - 1 ); ?></span>		
                     <br class="clear">
                 </div>
             </div>
@@ -238,9 +238,9 @@ class CtSettings {
     public function sanitize_ct_options($input) {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $ct_option = get_option('ct_option'); // Get the current options from the db
-            $ct_option[$_POST["ct_name"]]["ct_name"] = sanitize_text_field($_POST["ct_name"]);
-            $ct_option[$_POST["ct_name"]]["ct_label_name"] = sanitize_text_field(!empty($_POST["ct_label_name"]) ? $_POST["ct_label_name"] : $_POST["ct_name"]);
-            $ct_option[$_POST["ct_name"]]["ct_singular_name"] = sanitize_text_field(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_name"] = esc_attr($_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_label_name"] = esc_attr(!empty($_POST["ct_label_name"]) ? $_POST["ct_label_name"] : $_POST["ct_name"]);
+            $ct_option[$_POST["ct_name"]]["ct_singular_name"] = esc_attr(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $_POST["ct_name"]);
             $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
             $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
             $ct_option[$_POST["ct_name"]]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;

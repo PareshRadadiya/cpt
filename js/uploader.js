@@ -31,7 +31,9 @@ jQuery(document).ready(function($) {
         //When a file is selected, grab the URL and set it as the text field's value
         custom_uploader.on('select', function() {
             attachment = custom_uploader.state().get('selection').first().toJSON();
-            $('#cpt_menu_icon').val(attachment.url);
+            var attachment_id = getURLParameter(attachment.link, 'attachment_id');
+            console.log(attachment_id);
+            $('#cpt_menu_icon').val(attachment_id);
             $("#cpt_menu_icon_thumbnail").attr("src", attachment.url);
         });
 
@@ -43,5 +45,8 @@ jQuery(document).ready(function($) {
     $("#cpt_menu_icon").change(function() {
         $("#cpt_menu_icon_thumbnail").attr("src", $(this).val());
     });
-
+    
+    function getURLParameter(url, name) {
+        return (RegExp(name + '=' + '(.+?)(&|$)').exec(url) || [, null])[1];
+    }
 });

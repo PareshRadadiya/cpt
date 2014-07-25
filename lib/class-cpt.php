@@ -5,7 +5,7 @@
  */
 class CptSettings {
 
-    private $options, $dir, $editval, $helper;
+    private $options, $dir, $editval;
 
     function __construct() {
         $this->options = get_option('cpt_option');
@@ -49,7 +49,11 @@ class CptSettings {
                     'not_found' => __('No ' . $value['cpt_labels_name'] . ' found', 'cpt'),
                     'not_found_in_trash' => __('No ' . $value['cpt_labels_name'] . ' found in Trash', 'cpt'),
                 );
-
+                $attachment_url = null;
+                if (!empty($value['cpt_menu_icon'])) {
+                    $attachment_url = wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0];
+                    //$attachment_url = $attachment_datail[0];
+                }
                 register_post_type($value['cpt_post_type'], array(
                     'labels' => $labels,
                     'public' => $value['cpt_public'],
@@ -67,7 +71,7 @@ class CptSettings {
                     'has_archive' => $value['cpt_has_archive'],
                     'rewrite' => array('slug' => $value['cpt_post_type']),
                     'supports' => $value['cpt_supports'],
-                    'menu_icon' => $value['cpt_menu_icon'],
+                    'menu_icon' => $attachment_url,
                     'query_var' => $value['cpt_query_var']
                         )
                 );
@@ -143,10 +147,10 @@ class CptSettings {
                             <td><?php echo $value['cpt_description']; ?></td>
                             <td>
                                 <?php if (!empty($value['cpt_menu_icon'])) { ?>
-                                    <img src="<?php echo $value['cpt_menu_icon']; ?>" width="16" height="16" />
+                                    <img src="<?php echo wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0] ; ?>" />
                                 <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
-                    <?php } ?>
+                                <?php } ?>
                             </td>
                         </tr>
                         <?php
@@ -168,7 +172,7 @@ class CptSettings {
             </tfoot>
             </table>
             <div class="tablenav bottom">		
-                <div class="tablenav-pages one-page"><span class="displaying-num"><?php echo $index - 1; ?> items</span>		
+                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf(_n('%d item', '%d items', $index - 1, 'cpt-generator'), $index - 1); ?></span>		
                     <br class="clear">
                 </div>
             </div>
@@ -203,7 +207,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_labels_name', 'Label Name', array($this,'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name")
+                'cpt_labels_name', 'Label Name', array($this, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name")
         );
 
         add_settings_field(
@@ -299,9 +303,9 @@ class CptSettings {
     function sanitize_cpt_options($input) {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $cpt_option = get_option('cpt_option'); // Get the current options from the db
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = sanitize_text_field($_POST["cpt_post_type"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = sanitize_text_field(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = sanitize_text_field(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"]);
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = esc_attr($_POST["cpt_post_type"]);
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = esc_attr(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = esc_attr(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"]);
             $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = esc_textarea($_POST["cpt_description"]);
             $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
@@ -315,7 +319,7 @@ class CptSettings {
             $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
             $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
             $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : null;
+            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : "";
             $cpt_option[$_POST["cpt_post_type"]]["cpt_query_var"] = isset($_POST["cpt_query_var"]) ? true : false;
             return $cpt_option;
         }
@@ -348,10 +352,10 @@ class CptSettings {
      */
     function cpt_menu_icon_callback() {
         ?>
-        <input id="cpt_menu_icon" type="url" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
+        <input id="cpt_menu_icon" type="hidden" size="36" name="cpt_menu_icon" value="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" /> 
         <input id="choose_cpt_icon" class="button" type="button" value="Choose Image" />
         <br/>
-        <img id="cpt_menu_icon_thumbnail" src="<?php echo isset($this->editval) ? $this->editval['cpt_menu_icon'] : "" ?>" alt="icon not found"/>
+        <img id="cpt_menu_icon_thumbnail" width="16" height="16" src="<?php echo isset($this->editval) ? wp_get_attachment_image_src($this->editval['cpt_menu_icon'], "cpt_menu_icon")[0]: "" ?>" alt="icon not found"/>
         <?php
     }
 

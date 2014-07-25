@@ -24,6 +24,14 @@ class Admin {
 
         add_action('admin_enqueue_scripts', array($this, 'cpt_admin_scripts'));
         add_action('admin_print_styles', array($this, 'cpt_admin_styles'));
+
+        // Load Plugin Text Domain
+        add_action('init', array($this, 'load_plugin_textdomain'));
+
+        // Add image size for the Custom Post Type icon
+        if (function_exists('add_image_size')) {
+            add_image_size('cpt_menu_icon', 16, 16, true);
+        }
     }
 
     /**
@@ -172,6 +180,13 @@ class Admin {
             <div class="inside"></div>
         </div>
         <?php
+    }
+
+    /**
+     * Load the translation file for current language.
+     */
+    function load_plugin_textdomain() {
+        load_plugin_textdomain('cpt-generator', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 
 }
