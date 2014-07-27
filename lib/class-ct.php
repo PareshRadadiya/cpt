@@ -5,13 +5,12 @@
  */
 class CtSettings {
 
-    public $options, $dir, $editval;
+    private $options, $dir, $editval;
 
     public function __construct() {
         $this->options = get_option('ct_option');
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-        // $this->utility = new Utility();
 
         add_action('admin_init', array($this, 'ct_page_init')); // Set setting page for CT Generator
 
@@ -73,7 +72,7 @@ class CtSettings {
             }
         }
     }
-    
+
     /**
      *  section for view all post and add new
      */
@@ -83,10 +82,10 @@ class CtSettings {
         $this->add_ct_field();
         if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
             ?>
-            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct"><?php _e('All Taxonomy','cpt-generator') ?></a><hr/>
+            <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct"><?php _e('All Taxonomy', 'cpt-generator') ?></a><hr/>
             <div class="postbox">
                 <h3 class="hndle">
-                    <span><?php _e('Generate Taxonomy','cpt-generator'); ?></span>
+                    <span><?php _e('Generate Taxonomy', 'cpt-generator'); ?></span>
                 </h3>
                 <form method="post" action="options.php">
                     <div class="inside">
@@ -168,6 +167,7 @@ class CtSettings {
      * Add a new field to a ct setting section of a settings page
      */
     public function add_ct_field() {
+        global $cpt_helper;
         add_settings_section(
                 'ct_setting_section', // ID
                 __('General Settings', 'cpt-generator'), // Title
@@ -176,38 +176,38 @@ class CtSettings {
         );
 
         add_settings_field(
-                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name")
+                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_label_name', __('Label Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name")
+                'ct_label_name', __('Label Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_singular_name', __('Singular Name', 'cpt-generator'), array($this, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name")
+                'ct_singular_name', __('Singular Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_hierarchical', __('Hierarchical', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical")
+                'ct_hierarchical', __('Hierarchical', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_show_ui', __('Show UI', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui")
+                'ct_show_ui', __('Show UI', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus")
+                'ct_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_show_tagcloud', __('Show Tag Cloud', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud")
+                'ct_show_tagcloud', __('Show Tag Cloud', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud","editval"=>$this->editval)
         );
         add_settings_field(
-                'ct_show_admin_column', __('Show Admin Column', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column")
+                'ct_show_admin_column', __('Show Admin Column', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column","editval"=>$this->editval)
         );
 
         add_settings_field(
-                'ct_query_var', __('Query Var', 'cpt-generator'), array($this, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var")
+                'ct_query_var', __('Query Var', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var","editval"=>$this->editval)
         );
 
 
@@ -217,7 +217,7 @@ class CtSettings {
             array_push($post_type_support, array("field_value" => "$post_type", "field_label" => "$post_type", "field_checked" => ""));
         }
         add_settings_field(
-                'post_types', __('Post Type', 'cpt-generator'), array($this, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "post_types", "field_values" => $post_type_support)
+                'post_types', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "post_types", "field_values" => $post_type_support,"editval"=>$this->editval)
         );
     }
 
@@ -248,34 +248,7 @@ class CtSettings {
      * Print the General Section info
      */
     public function general_section_info() {
-       _e('Enter your general ct settings below');
-    }
-
-    function display_switch_option($args) {
-        ?>
-        <div class="onoffswitch">
-            <input type="checkbox" name="<?php _e($args["field_name"]) ?>" id="<?php _e($args["field_name"]) ?>" class="onoffswitch-checkbox" value="true" <?php echo isset($this->editval) ? checked($this->editval[$args["field_name"]], true) : "checked"; ?>>
-            <label class="onoffswitch-label" for="<?php _e($args["field_name"]) ?>">
-                <span class="onoffswitch-inner">
-                    <span class="onoffswitch-active"><span class="onoffswitch-switch">YES</span></span>
-                    <span class="onoffswitch-inactive"><span class="onoffswitch-switch">NO</span></span>
-                </span>
-            </label>
-        </div>
-        <?php
-    }
-
-    function display_textbox_option($args) {
-        ?>
-        <input type="text" name="<?php _e($args["field_name"]) ?>" value="<?php echo isset($this->editval) ? $this->editval[$args["field_name"]] : "" ?>"/>
-        <?php
-    }
-
-    function display_checkbox_option($args) {
-        foreach ($args["field_values"] as $value) {
-            ?><input type="checkbox"  name="<?php _e($args["field_name"]) ?>[]"  value="<?php _e($value["field_value"]) ?>"  <?php echo isset($this->editval) ? checked(in_array($value["field_value"], $this->editval[$args["field_name"]]), true) : $value["field_checked"]; ?>/> <?php _e($value["field_label"]) ?><br/>
-            <?php
-        }
+        _e('Enter your general ct settings below');
     }
 
 }

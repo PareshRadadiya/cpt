@@ -12,5 +12,7 @@
  */
 if (is_admin()) {
     require_once(plugin_dir_path(__FILE__) . 'lib/class-admin.php');
+    require_once(plugin_dir_path(__FILE__) . 'lib/class-helper.php');
+    $cpt_helper=new Helper();
     $admin = new Admin();
 }
