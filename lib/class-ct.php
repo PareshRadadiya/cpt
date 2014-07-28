@@ -8,7 +8,7 @@ class CtSettings {
     private $options, $dir, $editval;
 
     public function __construct() {
-        $this->options = get_option('ct_option');
+        $this->options = stripslashes_deep(get_option('ct_option'));
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
 
@@ -77,8 +77,6 @@ class CtSettings {
      *  section for view all post and add new
      */
     public function add_ct_section() {
-
-        $this->options = get_option('ct_option');
         $this->add_ct_field();
         if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
             ?>
@@ -98,7 +96,7 @@ class CtSettings {
                     </div>
                 </form>
             </div>
-        <?php
+            <?php
         } else {
             wp_enqueue_script('cpt-datatable-js');
             wp_enqueue_style('cpt-datatable-style');
@@ -223,16 +221,17 @@ class CtSettings {
     public function sanitize_ct_options($input) {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $ct_option = get_option('ct_option'); // Get the current options from the db
-            $ct_option[$_POST["ct_name"]]["ct_name"] = esc_attr($_POST["ct_name"]);
-            $ct_option[$_POST["ct_name"]]["ct_label_name"] = esc_attr(!empty($_POST["ct_label_name"]) ? $_POST["ct_label_name"] : $_POST["ct_name"]);
-            $ct_option[$_POST["ct_name"]]["ct_singular_name"] = esc_attr(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $_POST["ct_name"]);
-            $ct_option[$_POST["ct_name"]]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["ct_show_tagcloud"] = isset($_POST["ct_show_tagcloud"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["ct_query_var"] = isset($_POST["ct_query_var"]) ? true : false;
-            $ct_option[$_POST["ct_name"]]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
+            $slug = sanitize_title_with_dashes($_POST["ct_name"]);
+            $ct_option[$slug]["ct_name"] = $slug;
+            $ct_option[$slug]["ct_label_name"] = esc_attr(!empty($_POST["ct_label_name"]) ? $_POST["ct_label_name"] : $slug);
+            $ct_option[$slug]["ct_singular_name"] = esc_attr(!empty($_POST["ct_singular_name"]) ? $_POST["ct_singular_name"] : $slug);
+            $ct_option[$slug]["ct_hierarchical"] = isset($_POST["ct_hierarchical"]) ? true : false;
+            $ct_option[$slug]["ct_show_ui"] = isset($_POST["ct_show_ui"]) ? true : false;
+            $ct_option[$slug]["ct_show_in_nav_menus"] = isset($_POST["ct_show_in_nav_menus"]) ? true : false;
+            $ct_option[$slug]["ct_show_tagcloud"] = isset($_POST["ct_show_tagcloud"]) ? true : false;
+            $ct_option[$slug]["ct_show_admin_column"] = isset($_POST["ct_show_admin_column"]) ? true : false;
+            $ct_option[$slug]["ct_query_var"] = isset($_POST["ct_query_var"]) ? true : false;
+            $ct_option[$slug]["post_types"] = isset($_POST["post_types"]) ? $_POST["post_types"] : array('');
 
             return $ct_option;
         }

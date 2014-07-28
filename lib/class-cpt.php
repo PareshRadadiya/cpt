@@ -8,10 +8,9 @@ class CptSettings {
     private $options, $dir, $editval;
 
     function __construct() {
-        $this->options = get_option('cpt_option');
+        $this->options = stripslashes_deep(get_option('cpt_option')) ;
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
-
         add_action('admin_init', array($this, 'cpt_register_setting')); // Set setting page for CPT Generator
         /*
          * delete or edit cpt 
@@ -36,7 +35,6 @@ class CptSettings {
     function register_cpt() {
         if ($this->options) {
             foreach ($this->options as $value) {
-
                 $labels = array(
                     'name' => __($value['cpt_labels_name'], 'cpt-generator'),
                     'singular_name' => __($value['cpt_labels_singular_name'], 'cpt-generator'),
@@ -84,8 +82,6 @@ class CptSettings {
      * section for view all post and add new
      */
     function add_cpt_section() {
-
-        $this->options = get_option('cpt_option');
         $this->add_cpt_field();
 
         if (isset($_GET["editmode"]) && !isset($_GET["settings-updated"])) {
@@ -292,24 +288,25 @@ class CptSettings {
     function sanitize_cpt_options($input) {
         if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
             $cpt_option = get_option('cpt_option'); // Get the current options from the db
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_post_type"] = esc_attr($_POST["cpt_post_type"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_name"] = esc_attr(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_labels_singular_name"] = esc_attr(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $_POST["cpt_post_type"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_description"] = esc_textarea($_POST["cpt_description"]);
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_position"] = $_POST["cpt_menu_position"];
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : "";
-            $cpt_option[$_POST["cpt_post_type"]]["cpt_query_var"] = isset($_POST["cpt_query_var"]) ? true : false;
+            $slug=sanitize_title_with_dashes($_POST["cpt_post_type"]);
+            $cpt_option[$slug]["cpt_post_type"] = $slug;
+            $cpt_option[$slug]["cpt_labels_name"] = esc_attr(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
+            $cpt_option[$slug]["cpt_labels_singular_name"] =  esc_attr(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $slug);
+            $cpt_option[$slug]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
+            $cpt_option[$slug]["cpt_description"] = esc_textarea($_POST["cpt_description"]);
+            $cpt_option[$slug]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
+            $cpt_option[$slug]["cpt_publicly_queryable"] = isset($_POST["cpt_publicly_queryable"]) ? true : false;
+            $cpt_option[$slug]["cpt_show_ui"] = isset($_POST["cpt_show_ui"]) ? true : false;
+            $cpt_option[$slug]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
+            $cpt_option[$slug]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
+            $cpt_option[$slug]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
+            $cpt_option[$slug]["cpt_menu_position"] = $_POST["cpt_menu_position"];
+            $cpt_option[$slug]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
+            $cpt_option[$slug]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
+            $cpt_option[$slug]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
+            $cpt_option[$slug]["cpt_supports"] = isset($_POST["cpt_supports"]) ? $_POST["cpt_supports"] : array('');
+            $cpt_option[$slug]["cpt_menu_icon"] = !empty($_POST["cpt_menu_icon"]) ? $_POST["cpt_menu_icon"] : "";
+            $cpt_option[$slug]["cpt_query_var"] = isset($_POST["cpt_query_var"]) ? true : false;
             return $cpt_option;
         }
     }
