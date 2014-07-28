@@ -94,6 +94,9 @@ class CtSettings {
                         submit_button();
                         ?>
                     </div>
+                    <?php if (isset($this->editval)) { ?>
+                        <input type="hidden" name="ct_name" value="<?php echo $_GET["ct_name"] ?>"/>
+                    <?php } ?>
                 </form>
             </div>
             <?php
@@ -168,7 +171,7 @@ class CtSettings {
         );
 
         add_settings_field(
-                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name", "editval" => $this->editval)
+                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($this, 'ct_name'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name", "editval" => $this->editval)
         );
 
         add_settings_field(
@@ -219,7 +222,7 @@ class CtSettings {
      * @param array $input Contains all settings fields as array keys
      */
     public function sanitize_ct_options($input) {
-        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
+        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field') && isset($_POST["ct_name"])) {
             $ct_option = get_option('ct_option'); // Get the current options from the db
             $slug = sanitize_title_with_dashes($_POST["ct_name"]);
             $ct_option[$slug]["ct_name"] = $slug;
@@ -242,6 +245,18 @@ class CtSettings {
      */
     public function general_section_info() {
         _e('Enter your general ct settings below');
+    }
+
+    function ct_name() {
+        if (isset($this->editval)) {
+            ?>
+            <label><?php _e($this->editval["ct_name"]) ?></label>
+            <?php
+        } else {
+            ?>
+            <input type="text" name="ct_name" />
+            <?php
+        }
     }
 
 }

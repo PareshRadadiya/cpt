@@ -8,7 +8,7 @@ class CptSettings {
     private $options, $dir, $editval;
 
     function __construct() {
-        $this->options = stripslashes_deep(get_option('cpt_option')) ;
+        $this->options = stripslashes_deep(get_option('cpt_option'));
         $this->dir = plugins_url('', __FILE__);
         $this->editval;
         add_action('admin_init', array($this, 'cpt_register_setting')); // Set setting page for CPT Generator
@@ -50,7 +50,6 @@ class CptSettings {
                 $attachment_url = null;
                 if (!empty($value['cpt_menu_icon'])) {
                     $attachment_url = wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0];
-                    //$attachment_url = $attachment_datail[0];
                 }
                 register_post_type($value['cpt_post_type'], array(
                     'labels' => $labels,
@@ -100,9 +99,12 @@ class CptSettings {
                         submit_button();
                         ?>
                     </div>
+                    <?php if (isset($this->editval)) { ?>
+                        <input type="hidden" name="cpt_post_type" value="<?php echo $_GET["cpt_post_type"] ?>"/>
+                    <?php } ?>
                 </form>
             </div>
-        <?php
+            <?php
         } else {
             wp_enqueue_script('cpt-datatable-js');
             wp_enqueue_style('cpt-datatable-style');
@@ -142,7 +144,7 @@ class CptSettings {
                                     <img src="<?php echo wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0]; ?>" />
                                 <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
-                    <?php } ?>
+                                <?php } ?>
                             </td>
                         </tr>
                         <?php
@@ -159,7 +161,7 @@ class CptSettings {
             <th class="manage-column"><?php _e('Icon', 'cpt-generator') ?></th>
             </tfoot>
             </table>
-         
+
             <?php
         }
     }
@@ -188,7 +190,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_post_type', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type", "editval" => $this->editval)
+                'cpt_post_type', __('Post Type', 'cpt-generator'), array($this, 'cpt_post_type_name'), 'cpt-generator', 'cpt_setting_section'
         );
 
         add_settings_field(
@@ -286,12 +288,12 @@ class CptSettings {
      * @param array $input Contains all settings fields as array keys
      */
     function sanitize_cpt_options($input) {
-        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field')) {
+        if (!empty($_POST) && check_admin_referer('save_options_action', 'save_options_nonce_field') && isset($_POST["cpt_post_type"])) {
             $cpt_option = get_option('cpt_option'); // Get the current options from the db
-            $slug=sanitize_title_with_dashes($_POST["cpt_post_type"]);
+            $slug = sanitize_title_with_dashes($_POST["cpt_post_type"]);
             $cpt_option[$slug]["cpt_post_type"] = $slug;
             $cpt_option[$slug]["cpt_labels_name"] = esc_attr(!empty($_POST["cpt_labels_name"]) ? $_POST["cpt_labels_name"] : $_POST["cpt_post_type"]);
-            $cpt_option[$slug]["cpt_labels_singular_name"] =  esc_attr(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $slug);
+            $cpt_option[$slug]["cpt_labels_singular_name"] = esc_attr(!empty($_POST["cpt_labels_singular_name"]) ? $_POST["cpt_labels_singular_name"] : $slug);
             $cpt_option[$slug]["cpt_public"] = isset($_POST["cpt_public"]) ? true : false;
             $cpt_option[$slug]["cpt_description"] = esc_textarea($_POST["cpt_description"]);
             $cpt_option[$slug]["cpt_exclude_from_search"] = isset($_POST["cpt_exclude_from_search"]) ? true : false;
@@ -300,7 +302,7 @@ class CptSettings {
             $cpt_option[$slug]["cpt_show_in_nav_menus"] = isset($_POST["cpt_show_in_nav_menus"]) ? true : false;
             $cpt_option[$slug]["cpt_show_in_menu"] = isset($_POST["cpt_show_in_menu"]) ? true : false;
             $cpt_option[$slug]["cpt_show_in_admin_bar"] = isset($_POST["cpt_show_in_admin_bar"]) ? true : false;
-            $cpt_option[$slug]["cpt_menu_position"] = $_POST["cpt_menu_position"];
+            $cpt_option[$slug]["cpt_menu_position"] = (isset($_POST["cpt_menu_position"]) && absint($_POST["cpt_menu_position"])) ? $_POST["cpt_menu_position"] : "25";
             $cpt_option[$slug]["cpt_has_archive"] = isset($_POST["cpt_has_archive"]) ? true : false;
             $cpt_option[$slug]["cpt_taxonomies"] = isset($_POST["cpt_taxonomies"]) ? $_POST["cpt_taxonomies"] : array('');
             $cpt_option[$slug]["cpt_hierarchical"] = isset($_POST["cpt_hierarchical"]) ? true : false;
@@ -309,6 +311,7 @@ class CptSettings {
             $cpt_option[$slug]["cpt_query_var"] = isset($_POST["cpt_query_var"]) ? true : false;
             return $cpt_option;
         }
+        return $input;
     }
 
     /**
@@ -343,6 +346,18 @@ class CptSettings {
         <br/>
         <img id="cpt_menu_icon_thumbnail" width="16" height="16" src="<?php echo isset($this->editval) ? wp_get_attachment_image_src($this->editval['cpt_menu_icon'], "cpt_menu_icon")[0] : "" ?>" alt="icon not found"/>
         <?php
+    }
+
+    function cpt_post_type_name() {
+        if (isset($this->editval)) {
+            ?>
+            <label><?php _e($this->editval["cpt_post_type"]) ?></label>
+            <?php
+        } else {
+            ?>
+            <input type="text" name="cpt_post_type" />
+            <?php
+        }
     }
 
 }

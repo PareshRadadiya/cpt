@@ -29,7 +29,7 @@ class Helper {
 
     function display_textbox_option($args) {
         ?>
-        <input type="text" name="<?php _e($args["field_name"]) ?>" value="<?php echo isset($args["editval"]) ? $args["editval"][$args["field_name"]] : "" ?>" <?php echo (isset($args["editval"]) && ($args["field_name"] == "cpt_post_type" || $args["field_name"] == "ct_name")) ? "readonly" : "" ?>/>
+        <input type="text" name="<?php _e($args["field_name"]) ?>" value="<?php echo isset($args["editval"]) ? $args["editval"][$args["field_name"]] : "" ?>"/>
         <?php
     }
 
