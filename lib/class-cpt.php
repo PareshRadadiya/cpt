@@ -134,7 +134,7 @@ class CptSettings {
                                 <div class="row-actions">
                                     <span class="edit"><a href="options-general.php?page=cpt-generator&tab=cpt&editmode=edit&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=cpt&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=cpt&editmode=delete&cpt_post_type=<?php echo $value['cpt_post_type']; ?>" title="Delete this item peremanetly" href="">Delete</a> </span>
 
                                 </div>
                             </td>
@@ -152,10 +152,6 @@ class CptSettings {
                         <?php
                         $index++;
                     }
-                } else {
-                    ?>
-                    <tr class="no-items"><td class="colspanchange" colspan="5">No custom posts found created using this plugin.</td></tr>
-                    <?php
                 }
                 ?>
             </tbody>

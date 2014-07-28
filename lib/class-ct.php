@@ -123,7 +123,7 @@ class CtSettings {
                                 <div class="row-actions">
                                     <span class="edit"><a href="options-general.php?page=cpt-generator&tab=ct&editmode=edit&ct_name=<?php echo $value['ct_name']; ?>" title="Edit this item">Edit</a> | </span>
 
-                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=ct&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Move this item to the Trash" href="">Trash</a> | </span>
+                                    <span class="trash"><a class="submitdelete" href="options-general.php?page=cpt-generator&tab=ct&editmode=delete&ct_name=<?php echo $value['ct_name']; ?>" title="Delete this item peremanetly" href="">Delete</a> </span>
 
                                 </div>
                             </td>
@@ -133,10 +133,6 @@ class CtSettings {
                         <?php
                         $index++;
                     }
-                } else {
-                    ?>
-                    <tr class="no-items"><td class="colspanchange" colspan="3">No custom taxonomy found created using this plugin.</td></tr>
-                    <?php
                 }
                 ?>
             </tbody>
