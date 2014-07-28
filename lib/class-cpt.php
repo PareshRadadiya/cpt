@@ -106,10 +106,13 @@ class CptSettings {
                     </div>
                 </form>
             </div>
-        <?php } else {
+        <?php
+        } else {
+            wp_enqueue_script('cpt-datatable-js');
+            wp_enqueue_style('cpt-datatable-style');
             ?>
             <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=cpt&editmode=add"><?php _e('Add New', 'cpt-generator') ?></a><hr/>
-            <table class="wp-list-table widefat fixed pages">
+            <table class="wp-list-table widefat fixed pages" id="datatable">
                 <thead>
                 <th class="manage-column"><?php _e('Post Name', 'cpt-generator') ?></th>
                 <th class="manage-column"><?php _e('Public', 'cpt-generator') ?></th>
@@ -143,7 +146,7 @@ class CptSettings {
                                     <img src="<?php echo wp_get_attachment_image_src($value['cpt_menu_icon'], "cpt_menu_icon")[0]; ?>" />
                                 <?php } else { ?>
                                     <div class="dashicons-before dashicons-admin-post"></div>
-                                <?php } ?>
+                    <?php } ?>
                             </td>
                         </tr>
                         <?php
@@ -164,11 +167,7 @@ class CptSettings {
             <th class="manage-column"><?php _e('Icon', 'cpt-generator') ?></th>
             </tfoot>
             </table>
-            <div class="tablenav bottom">		
-                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf(_n('%d item', '%d items', $index - 1, 'cpt-generator'), $index - 1); ?></span>		
-                    <br class="clear">
-                </div>
-            </div>
+         
             <?php
         }
     }
@@ -197,15 +196,15 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_post_type', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type","editval"=>$this->editval)
+                'cpt_post_type', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_post_type", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_labels_name', __('Label Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name","editval"=>$this->editval)
+                'cpt_labels_name', __('Label Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_name", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_labels_singular_name', __('Singular Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_singular_name","editval"=>$this->editval)
+                'cpt_labels_singular_name', __('Singular Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_labels_singular_name", "editval" => $this->editval)
         );
 
         add_settings_field(
@@ -213,31 +212,31 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_public', __('Public', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_public","editval"=>$this->editval)
+                'cpt_public', __('Public', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_public", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_exclude_from_search', __('Exclude From Search', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_exclude_from_search","editval"=>$this->editval)
+                'cpt_exclude_from_search', __('Exclude From Search', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_exclude_from_search", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_publicly_queryable', __('Publically Queryable', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_publicly_queryable","editval"=>$this->editval)
+                'cpt_publicly_queryable', __('Publically Queryable', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_publicly_queryable", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_show_ui', __('Show UI', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_ui","editval"=>$this->editval)
+                'cpt_show_ui', __('Show UI', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_ui", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_nav_menus","editval"=>$this->editval)
+                'cpt_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_nav_menus", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_show_in_menu', __('Show In Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_menu","editval"=>$this->editval)
+                'cpt_show_in_menu', __('Show In Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_menu", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_show_in_admin_bar', __('Show In Admin Bar', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_admin_bar","editval"=>$this->editval)
+                'cpt_show_in_admin_bar', __('Show In Admin Bar', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_show_in_admin_bar", "editval" => $this->editval)
         );
 
         add_settings_field(
@@ -245,7 +244,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_hierarchical', __('Hierarchical', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_hierarchical","editval"=>$this->editval)
+                'cpt_hierarchical', __('Hierarchical', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_hierarchical", "editval" => $this->editval)
         );
 
         $taxonomies = array(
@@ -254,11 +253,11 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_taxonomies', __('Built in Taxonomies', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_taxonomies", "field_values" => $taxonomies,"editval"=>$this->editval)
+                'cpt_taxonomies', __('Built in Taxonomies', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_taxonomies", "field_values" => $taxonomies, "editval" => $this->editval)
         );
 
         add_settings_field(
-                'cpt_has_archive', __('Has Archive', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_has_archive","editval"=>$this->editval)
+                'cpt_has_archive', __('Has Archive', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_has_archive", "editval" => $this->editval)
         );
 
         $supports = array(
@@ -276,7 +275,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_supports', __('Supports Type', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_supports", "field_values" => $supports,"editval"=>$this->editval)
+                'cpt_supports', __('Supports Type', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_supports", "field_values" => $supports, "editval" => $this->editval)
         );
 
 
@@ -285,7 +284,7 @@ class CptSettings {
         );
 
         add_settings_field(
-                'cpt_query_var', __('Query Var', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_query_var","editval"=>$this->editval)
+                'cpt_query_var', __('Query Var', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'cpt_setting_section', array("field_name" => "cpt_query_var", "editval" => $this->editval)
         );
     }
 

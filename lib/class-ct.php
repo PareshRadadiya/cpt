@@ -98,10 +98,13 @@ class CtSettings {
                     </div>
                 </form>
             </div>
-        <?php } else {
+        <?php
+        } else {
+            wp_enqueue_script('cpt-datatable-js');
+            wp_enqueue_style('cpt-datatable-style');
             ?>
             <a class="add-new-h2" href="options-general.php?page=cpt-generator&tab=ct&editmode=add"><?php _e('Add New', 'cpt-generator') ?></a><hr/>
-            <table class="wp-list-table widefat fixed pages">
+            <table class="wp-list-table widefat fixed pages"  id="datatable">
                 <thead>
                 <th class="manage-column"><?php _e('Name', 'cpt-generator') ?></th>
                 <th class="manage-column"><?php _e('Label', 'cpt-generator') ?></th>
@@ -143,11 +146,6 @@ class CtSettings {
             <th class="manage-column"><?php _e('Show UI', 'cpt-generator') ?></th>
             </tfoot>
             </table>
-            <div class="tablenav bottom">		
-                <div class="tablenav-pages one-page"><span class="displaying-num"><?php printf(_n('%d item', '%d items', $index - 1, 'cpt-generator'), $index - 1); ?></span>		
-                    <br class="clear">
-                </div>
-            </div>
             <?php
         }
     }
@@ -176,38 +174,38 @@ class CtSettings {
         );
 
         add_settings_field(
-                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name","editval"=>$this->editval)
+                'ct_name', __('Taxonomy Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_name", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_label_name', __('Label Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name","editval"=>$this->editval)
+                'ct_label_name', __('Label Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_label_name", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_singular_name', __('Singular Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name","editval"=>$this->editval)
+                'ct_singular_name', __('Singular Name', 'cpt-generator'), array($cpt_helper, 'display_textbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_singular_name", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_hierarchical', __('Hierarchical', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical","editval"=>$this->editval)
+                'ct_hierarchical', __('Hierarchical', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_hierarchical", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_show_ui', __('Show UI', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui","editval"=>$this->editval)
+                'ct_show_ui', __('Show UI', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_ui", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus","editval"=>$this->editval)
+                'ct_show_in_nav_menus', __('Show In Nav Menu', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_in_nav_menus", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_show_tagcloud', __('Show Tag Cloud', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud","editval"=>$this->editval)
+                'ct_show_tagcloud', __('Show Tag Cloud', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_tagcloud", "editval" => $this->editval)
         );
         add_settings_field(
-                'ct_show_admin_column', __('Show Admin Column', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column","editval"=>$this->editval)
+                'ct_show_admin_column', __('Show Admin Column', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_show_admin_column", "editval" => $this->editval)
         );
 
         add_settings_field(
-                'ct_query_var', __('Query Var', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var","editval"=>$this->editval)
+                'ct_query_var', __('Query Var', 'cpt-generator'), array($cpt_helper, 'display_switch_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "ct_query_var", "editval" => $this->editval)
         );
 
 
@@ -217,7 +215,7 @@ class CtSettings {
             array_push($post_type_support, array("field_value" => "$post_type", "field_label" => "$post_type", "field_checked" => ""));
         }
         add_settings_field(
-                'post_types', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "post_types", "field_values" => $post_type_support,"editval"=>$this->editval)
+                'post_types', __('Post Type', 'cpt-generator'), array($cpt_helper, 'display_checkbox_option'), 'cpt-generator', 'ct_setting_section', array("field_name" => "post_types", "field_values" => $post_type_support, "editval" => $this->editval)
         );
     }
 
