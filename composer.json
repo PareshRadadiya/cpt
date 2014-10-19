@@ -25,4 +25,7 @@
     "webroot-dir": "wp",
     "webroot-package": "wordpress"
   }
+  "require-dev": {
+        "phpunit/phpunit": "4.3.*"
+    }
 }

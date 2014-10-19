@@ -8,3 +8,4 @@ before_install:
 before_script:
   - composer install
   - composer selfupdate
+script: phpunit --configuration phpunit.xml --coverage-text
